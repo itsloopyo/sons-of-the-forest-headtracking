@@ -1,0 +1,22 @@
+name: Release
+run-name: "Release ${{ github.ref_name }}"
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  release:
+    uses: itsloopyo/cameraunlock-core/.github/workflows/release-bepinex-mod.yml@main
+    with:
+      csproj-path: src/SonsOfTheForestHeadTracking/SonsOfTheForestHeadTracking.csproj
+      project-name: "Head Tracking for Sons of the Forest"
+      build-output-dir: src/SonsOfTheForestHeadTracking/bin/Release/net6.0
+      mod-name: SonsOfTheForestHeadTracking
+      mod-dlls: "SonsOfTheForestHeadTracking.dll CameraUnlock.Core.dll"
+      artifact-paths: "src/SonsOfTheForestHeadTracking/ cameraunlock-core scripts/install.cmd scripts/uninstall.cmd prebuilt/"
+      prebuilt-dir: prebuilt
+      create-nexus-zip: "true"
+    permissions:
+      contents: write

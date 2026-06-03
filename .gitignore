@@ -1,0 +1,42 @@
+# Build output
+bin/
+obj/
+
+# Game reference DLLs (copied at build time)
+src/*/libs/*.dll
+
+# NuGet
+packages/
+*.nupkg
+
+# Release packaging
+dist/
+release/
+
+# IDE
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+
+# Pixi
+.pixi/
+
+# AI tooling
+.claude/
+.millhouse/
+.lab/
+AGENTS.md
+CLAUDE.md
+.mcp.json
+
+# Install state
+.headtracking-state.json
+
+# NexusMods page source (not for the repo)
+NEXUS_MODS.md
+
+# OS
+.DS_Store
+Thumbs.db

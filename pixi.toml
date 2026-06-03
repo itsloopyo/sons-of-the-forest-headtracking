@@ -1,0 +1,22 @@
+[workspace]
+name = "sons-of-the-forest-head-tracking"
+version = "0.0.0"
+description = "Head tracking mod for Sons of the Forest using CameraUnlock shared library"
+channels = ["conda-forge"]
+platforms = ["win-64"]
+
+[tasks]
+sync = "git submodule update --remote cameraunlock-core"
+restore = "dotnet restore src/SonsOfTheForestHeadTracking/SonsOfTheForestHeadTracking.csproj"
+setup = { cmd = "powershell -ExecutionPolicy Bypass -File scripts/setup-libs.ps1", depends-on = ["restore"] }
+build = { cmd = "dotnet build src/SonsOfTheForestHeadTracking/SonsOfTheForestHeadTracking.csproj -c Release", depends-on = ["setup"] }
+install = { cmd = "powershell -ExecutionPolicy Bypass -File scripts/deploy.ps1 Release", depends-on = ["build"] }
+package = { cmd = "powershell -ExecutionPolicy Bypass -File scripts/package-release.ps1", depends-on = ["build"] }
+uninstall = "scripts\\uninstall.cmd"
+test = "powershell -ExecutionPolicy Bypass -File scripts/validate-repo.ps1"
+clean = "dotnet clean src/SonsOfTheForestHeadTracking/SonsOfTheForestHeadTracking.csproj"
+
+# Bump vendored mod-loader copies to latest upstream. Manual; commit the result.
+update-deps = "powershell -ExecutionPolicy Bypass -File scripts/update-deps.ps1"
+
+release = "powershell -ExecutionPolicy Bypass -File scripts/release.ps1"

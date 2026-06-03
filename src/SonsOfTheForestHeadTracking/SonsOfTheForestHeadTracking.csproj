@@ -1,0 +1,65 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <AssemblyName>SonsOfTheForestHeadTracking</AssemblyName>
+    <RootNamespace>SonsOfTheForestHeadTracking</RootNamespace>
+    <Version>0.0.0</Version>
+    <LangVersion>latest</LangVersion>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <OutputType>Library</OutputType>
+    <Authors>itsloopyo</Authors>
+    <Copyright>Copyright (c) 2026 itsloopyo. Licensed under the MIT License.</Copyright>
+    <Description>Head tracking mod for Sons of the Forest (Unity 2022.2 IL2CPP) using CameraUnlock.Core</Description>
+    <!-- libs/ holds BepInEx + Il2CppInterop proxy assemblies copied from the game install
+         by scripts/setup-libs.ps1. They are facades over native code, so version conflicts
+         and missing-reference warnings from them are expected and not actionable. -->
+    <NoWarn>$(NoWarn);MSB3277;CS8002</NoWarn>
+  </PropertyGroup>
+
+  <!-- CameraUnlock shared library (framework-agnostic core only - the Unity helper
+       assembly targets real UnityEngine reference assemblies, which cannot be mixed
+       with the Il2CppInterop proxies this mod compiles against). -->
+  <ItemGroup>
+    <ProjectReference Include="..\..\cameraunlock-core\csharp\src\CameraUnlock.Core\CameraUnlock.Core.csproj" />
+  </ItemGroup>
+
+  <!-- Unity-coupled CameraUnlock helpers, shared as source for IL2CPP mods. -->
+  <PropertyGroup>
+    <CameraUnlockFastBoot>true</CameraUnlockFastBoot>
+  </PropertyGroup>
+  <Import Project="..\..\cameraunlock-core\csharp\il2cpp\CameraUnlock.Core.Unity.Il2Cpp.props" />
+
+  <!-- Game-install references (populated by scripts/setup-libs.ps1, gitignored). -->
+  <ItemGroup>
+    <GameLib Include="BepInEx.Core" />
+    <GameLib Include="BepInEx.Unity.IL2CPP" />
+    <GameLib Include="BepInEx.Unity.Common" />
+    <GameLib Include="Il2CppInterop.Runtime" />
+    <GameLib Include="0Harmony" />
+    <GameLib Include="Il2Cppmscorlib" />
+    <GameLib Include="Il2CppSystem" />
+    <GameLib Include="Il2CppSystem.Core" />
+    <GameLib Include="UnityEngine" />
+    <GameLib Include="UnityEngine.CoreModule" />
+    <GameLib Include="UnityEngine.InputLegacyModule" />
+    <GameLib Include="UnityEngine.PhysicsModule" />
+    <GameLib Include="UnityEngine.VideoModule" />
+    <GameLib Include="UnityEngine.AnimationModule" />
+    <GameLib Include="UnityEngine.UI" />
+    <GameLib Include="Sons" />
+    <GameLib Include="Endnight" />
+
+    <Reference Include="@(GameLib)">
+      <HintPath>libs\%(Identity).dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="libs\**" />
+    <None Remove="libs\**" />
+  </ItemGroup>
+</Project>

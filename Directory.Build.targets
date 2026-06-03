@@ -1,0 +1,7 @@
+<Project>
+  <!-- Restrict submodule target frameworks to only what Sons of the Forest needs.
+       Unity 2022.2 / IL2CPP. -->
+  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'CameraUnlock.Core'">
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
+  </PropertyGroup>
+</Project>

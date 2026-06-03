@@ -1,0 +1,56 @@
+name: Build
+
+# This mod is BepInEx 6 IL2CPP. It compiles against Il2CppInterop proxy
+# assemblies (UnityEngine.*, Il2Cpp*, Sons.dll, Endnight.dll) that only exist
+# after the game is installed and launched once with BepInEx, and that are
+# gitignored / never committed per the repo's no-game-code rule. A
+# GitHub-hosted runner has no game install, so it cannot generate those refs
+# and therefore cannot compile or package this mod. Building, packaging, and
+# releasing are local-only (scripts/release.ps1 builds locally and commits
+# prebuilt/ DLLs; release.yml then zips those committed DLLs - it never
+# recompiles). This per-push job is intentionally a validate-only gate: it
+# runs every check that does NOT require the game. That is why it does not
+# upload an installer artifact, unlike the catalogue-wide build.yml contract.
+
+on:
+  push:
+    branches: ['**']
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - 'LICENSE'
+  pull_request:
+    branches: [main]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - 'LICENSE'
+
+jobs:
+  validate:
+    name: Validate
+    runs-on: windows-latest
+    if: ${{ !startsWith(github.event.head_commit.message, 'Release v') }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          submodules: recursive
+
+      - name: Validate repo consistency
+        shell: pwsh
+        run: |
+          powershell -ExecutionPolicy Bypass -File scripts/validate-repo.ps1
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host "::error::Repo validation failed"
+            exit 1
+          }
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore NuGet packages
+        run: dotnet restore src/SonsOfTheForestHeadTracking/SonsOfTheForestHeadTracking.csproj
