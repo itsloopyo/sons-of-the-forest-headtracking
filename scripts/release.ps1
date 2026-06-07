@@ -134,6 +134,11 @@ Update-VersionInFile -Path $installCmdPath `
     -Pattern 'set "MOD_VERSION=[^"]+"' -Replacement "set `"MOD_VERSION=$Version`"" `
     -Label "install.cmd MOD_VERSION"
 
+$manifestPath = Join-Path $projectDir "launcher-manifest.json"
+Update-VersionInFile -Path $manifestPath `
+    -Pattern '(?m)^(    "version":\s*)"[^"]+"' -Replacement "`${1}`"$Version`"" `
+    -Label "launcher-manifest.json version"
+
 # Step 3: Build and update prebuilt DLLs
 Write-Host "Building release..." -ForegroundColor Cyan
 Push-Location $projectDir
@@ -196,6 +201,7 @@ git add $csprojPath
 git add $pluginPath
 git add $pixiTomlPath
 git add $installCmdPath
+git add $manifestPath
 git add "$projectDir/prebuilt"
 git add $changelogPath
 git commit -m "Release v$Version"

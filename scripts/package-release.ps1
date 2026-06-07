@@ -103,6 +103,25 @@ foreach ($doc in $docFiles) {
     }
 }
 
+# Launcher manifest: ship at the installer-ZIP root so its plugins/* source
+# paths resolve against the zip lopari ingests. lopari reads ONLY
+# launcher-manifest.json (deploy/manifest.rs MANIFEST_FILE); stamp the built
+# version into mod_info.version so the manifest can never disagree with the
+# DLLs shipped alongside it.
+$manifestSource = Join-Path $projectDir "launcher-manifest.json"
+if (-not (Test-Path $manifestSource)) {
+    throw "launcher-manifest.json not found at repo root ($manifestSource)"
+}
+$manifestJson = Get-Content $manifestSource -Raw | ConvertFrom-Json
+$manifestJson.mod_info.version = $version
+$manifestDest = Join-Path $ghStagingDir "launcher-manifest.json"
+[System.IO.File]::WriteAllText(
+    $manifestDest,
+    ($manifestJson | ConvertTo-Json -Depth 10),
+    (New-Object System.Text.UTF8Encoding($false))
+)
+Write-Host "  launcher-manifest.json (v$version)" -ForegroundColor Green
+
 $ghZipName = "SonsOfTheForestHeadTracking-v$version-installer.zip"
 $ghZipPath = Join-Path $releaseDir $ghZipName
 if (Test-Path $ghZipPath) { Remove-Item $ghZipPath -Force }

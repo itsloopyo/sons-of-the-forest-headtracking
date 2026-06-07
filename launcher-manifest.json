@@ -1,0 +1,34 @@
+{
+  "schema_version": 2,
+  "mod_info": {
+    "name": "SonsOfTheForestHeadTracking",
+    "version": "0.0.0",
+    "game_id": "sons-of-the-forest"
+  },
+  "strategy": "BepInEx6",
+  "delivery_mode": "manifest",
+
+  "loader": {
+    "archives": [
+      { "source": "vendor/bepinex/BepInEx_UnityIL2CPP_x64.zip", "dest": "", "flatten": null }
+    ],
+    "detect": [
+      "BepInEx/core/BepInEx.Core.dll",
+      "BepInEx/core/BepInEx.dll"
+    ],
+    "seed": [
+      {
+        "target": "BepInEx/config/BepInEx.cfg",
+        "content_b64": "W0xvZ2dpbmcuQ29uc29sZV0NCkVuYWJsZWQgPSB0cnVlDQoNCltMb2dnaW5nLkRpc2tdDQpFbmFibGVkID0gdHJ1ZQ0K"
+      }
+    ]
+  },
+
+  "files": [
+    { "source": "plugins/SonsOfTheForestHeadTracking.dll", "target": "BepInEx/plugins/SonsOfTheForestHeadTracking.dll" },
+    { "source": "plugins/CameraUnlock.Core.dll", "target": "BepInEx/plugins/CameraUnlock.Core.dll" }
+  ],
+
+  "runtime_requirements": [],
+  "dependencies": []
+}
