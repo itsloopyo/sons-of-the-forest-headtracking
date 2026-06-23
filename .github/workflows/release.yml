@@ -20,3 +20,4 @@ jobs:
       create-nexus-zip: "true"
     permissions:
       contents: write
+    secrets: inherit
