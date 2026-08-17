@@ -6,7 +6,7 @@ It includes or depends on the following third-party components.
 
 ## BepInEx 6 (IL2CPP bleeding edge)
 
-- **Version:** 6.0.0-be.755
+- **Version:** 6.0.0-be.785
 - **License:** LGPL-2.1
 - **Upstream:** https://github.com/BepInEx/BepInEx
 - **Usage:** Mod loader and plugin framework hosting this mod inside the game process.
@@ -19,7 +19,7 @@ repository; we ship the upstream binary unmodified.
 
 ## HarmonyX
 
-- **Version:** As bundled with BepInEx 6.0.0-be.755
+- **Version:** As bundled with BepInEx 6.0.0-be.785
 - **License:** MIT
 - **Upstream:** https://github.com/BepInEx/HarmonyX
 - **Usage:** Runtime patching library referenced at build time and loaded as a dependency of BepInEx; not modified.
@@ -29,7 +29,7 @@ repository; we ship the upstream binary unmodified.
 
 ## Il2CppInterop
 
-- **Version:** As bundled with BepInEx 6.0.0-be.755
+- **Version:** As bundled with BepInEx 6.0.0-be.785
 - **License:** LGPL-3.0
 - **Upstream:** https://github.com/BepInEx/Il2CppInterop
 - **Usage:** IL2CPP managed interop layer; this mod compiles against its generated proxy assemblies and loads it as a dependency of BepInEx 6 IL2CPP; not modified.
