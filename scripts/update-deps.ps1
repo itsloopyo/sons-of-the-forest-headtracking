@@ -7,7 +7,7 @@
 # See AGENTS.md "Vendoring Third-Party Dependencies".
 #
 # BepInEx 6 IL2CPP is bleeding edge and only published on builds.bepinex.dev,
-# NOT on GitHub releases. Refresh-VendoredLoader's GitHub mode does not apply.
+# NOT on GitHub releases. Update-VendoredLoader's GitHub mode does not apply.
 # We scrape the build server's project index directly.
 
 Set-StrictMode -Version Latest
