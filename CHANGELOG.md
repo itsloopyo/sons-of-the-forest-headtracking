@@ -22,7 +22,17 @@ below; a dated entry is added when a versioned release is cut.
 - Gameplay gating on `LocalPlayer.IsInWorld` and `Time.timeScale`, with
   auto-recenter on entering the world and a clean view restore when gated.
 - OpenTrack UDP receiver (port 4242) driving `HeadTrackingSession`:
-  smoothing (0.15 baseline floor), sample-rate interpolation, auto-recenter
-  on first connection, and tracking-loss hold.
+  two-parameter smoothing (`LocalSmoothing` 0.0 / `RemoteSmoothing` 0.15,
+  selected per connection from the packet source address), sample-rate
+  interpolation, auto-recenter on first connection, and tracking-loss hold.
 - Hotkeys (with Ctrl+Shift chord alternatives): End to toggle, Home to
   recenter, Page Up to cycle tracking mode, Page Down to toggle yaw mode.
+
+### Changed
+- Replaced the single `Smoothing` config key with `LocalSmoothing` (default
+  0.0) and `RemoteSmoothing` (default 0.15), selected per connection from the
+  packet source address.
+- Removed the `PositionSmoothing` key: position now uses the same
+  connection-selected value as rotation.
+- Removed the hidden 0.15 baseline smoothing floor, so local trackers get
+  zero-latency tracking by default.

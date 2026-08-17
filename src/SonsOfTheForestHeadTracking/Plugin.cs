@@ -36,7 +36,11 @@ public class Plugin : BasePlugin
 
         var processor = new TrackingProcessor
         {
-            SmoothingFactor = config.Smoothing.Value,
+            // Selected per connection by HeadTrackingSession, which re-reads locality
+            // from the receiver every Update: loopback senders get LocalSmoothing,
+            // remote network devices get RemoteSmoothing.
+            LocalSmoothing = config.LocalSmoothing.Value,
+            RemoteSmoothing = config.RemoteSmoothing.Value,
             Sensitivity = new SensitivitySettings(
                 config.YawSensitivity.Value,
                 config.PitchSensitivity.Value,
@@ -50,7 +54,7 @@ public class Plugin : BasePlugin
 
         var positionProcessor = new PositionProcessor
         {
-            Settings = new PositionSettings(
+            Settings = PositionSettings.Symmetric(
                 config.PositionSensitivityX.Value,
                 config.PositionSensitivityY.Value,
                 config.PositionSensitivityZ.Value,
@@ -58,7 +62,8 @@ public class Plugin : BasePlugin
                 config.PositionLimitY.Value,
                 config.PositionLimitZ.Value,
                 config.PositionLimitZBack.Value,
-                config.PositionSmoothing.Value,
+                localSmoothing: config.LocalSmoothing.Value,
+                remoteSmoothing: config.RemoteSmoothing.Value,
                 invertX: config.InvertPositionX.Value,
                 invertY: config.InvertPositionY.Value,
                 invertZ: config.InvertPositionZ.Value)

@@ -12,7 +12,8 @@ public sealed class PluginConfig
     public ConfigEntry<bool> InvertYaw { get; }
     public ConfigEntry<bool> InvertPitch { get; }
     public ConfigEntry<bool> InvertRoll { get; }
-    public ConfigEntry<float> Smoothing { get; }
+    public ConfigEntry<float> LocalSmoothing { get; }
+    public ConfigEntry<float> RemoteSmoothing { get; }
     public ConfigEntry<bool> WorldSpaceYaw { get; }
 
     public ConfigEntry<bool> PositionEnabled { get; }
@@ -23,7 +24,6 @@ public sealed class PluginConfig
     public ConfigEntry<float> PositionLimitY { get; }
     public ConfigEntry<float> PositionLimitZ { get; }
     public ConfigEntry<float> PositionLimitZBack { get; }
-    public ConfigEntry<float> PositionSmoothing { get; }
     public ConfigEntry<bool> InvertPositionX { get; }
     public ConfigEntry<bool> InvertPositionY { get; }
     public ConfigEntry<bool> InvertPositionZ { get; }
@@ -48,8 +48,11 @@ public sealed class PluginConfig
             new ConfigDescription("Pitch sensitivity multiplier.", new AcceptableValueRange<float>(-5f, 5f)));
         RollSensitivity = cfg.Bind("Sensitivity", "RollSensitivity", 1.0f,
             new ConfigDescription("Roll sensitivity multiplier.", new AcceptableValueRange<float>(-5f, 5f)));
-        Smoothing = cfg.Bind("Sensitivity", "Smoothing", 0.0f,
-            new ConfigDescription("Rotation smoothing (0=none, 1=heavy). A 0.15 floor is applied internally.",
+        LocalSmoothing = cfg.Bind("Smoothing", "LocalSmoothing", 0.0f,
+            new ConfigDescription("Smoothing applied when the tracker runs on this machine (loopback). 0 = no smoothing, 1 = heavy. Covers rotation and position.",
+                new AcceptableValueRange<float>(0f, 1f)));
+        RemoteSmoothing = cfg.Bind("Smoothing", "RemoteSmoothing", 0.15f,
+            new ConfigDescription("Smoothing applied when the tracker is a remote device on the network. 0 = no smoothing, 1 = heavy. Covers rotation and position.",
                 new AcceptableValueRange<float>(0f, 1f)));
 
         InvertYaw = cfg.Bind("CoordinateTransform", "InvertYaw", false,
@@ -76,8 +79,6 @@ public sealed class PluginConfig
         PositionLimitZBack = cfg.Bind("Position", "PositionLimitZBack", 0.10f,
             new ConfigDescription("Maximum backward lean in meters (small, prevents clipping into the player).",
                 new AcceptableValueRange<float>(0.01f, 0.5f)));
-        PositionSmoothing = cfg.Bind("Position", "PositionSmoothing", 0.15f,
-            new ConfigDescription("Position smoothing (0=minimum, 1=heavy).", new AcceptableValueRange<float>(0f, 1f)));
         InvertPositionX = cfg.Bind("Position", "InvertPositionX", true,
             "Invert lateral movement (default on: converts OpenTrack X to Unity, verified for Sons of the Forest).");
         InvertPositionY = cfg.Bind("Position", "InvertPositionY", false,

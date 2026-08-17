@@ -111,8 +111,14 @@ WorldSpaceYaw = true
 YawSensitivity = 1
 PitchSensitivity = 1
 RollSensitivity = 1
-# Rotation smoothing (0 = none, 1 = heavy). A 0.15 floor is applied internally.
-Smoothing = 0
+
+[Smoothing]
+# Picked per connection from the packet source address. Both cover rotation
+# and position. 0 = no smoothing, 1 = heavy.
+# Tracker running on this machine (loopback):
+LocalSmoothing = 0
+# Tracker on a remote network device, e.g. a phone over WiFi:
+RemoteSmoothing = 0.15
 
 [CoordinateTransform]
 # Flip an axis if it moves the wrong way.
@@ -133,7 +139,6 @@ PositionLimitY = 0.2
 PositionLimitZ = 0.4
 # Backward lean limit (small, prevents clipping into the player).
 PositionLimitZBack = 0.1
-PositionSmoothing = 0.15
 # Default on: converts OpenTrack axes to Unity (verified for Sons of the Forest).
 InvertPositionX = true
 InvertPositionY = false
@@ -161,8 +166,8 @@ PositionToggleKey = PageUp
 
 **Jittery / unstable tracking**
 
-- Raise `Smoothing` in the config file (try 0.3 to 0.5).
-- Phone trackers over WiFi are the most jitter-prone; raise smoothing further or use a wired tracker.
+- Raise `RemoteSmoothing` (phone or other network tracker) or `LocalSmoothing` (tracker on this PC) in the config file, try 0.3 to 0.5.
+- Phone trackers over WiFi are the most jitter-prone; raise `RemoteSmoothing` further or use a wired tracker.
 
 **Wrong rotation axis**
 
