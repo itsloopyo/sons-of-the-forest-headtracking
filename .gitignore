@@ -40,3 +40,6 @@ NEXUS_MODS.md
 # OS
 .DS_Store
 Thumbs.db
+scratch/
+libs/
+mcp.json
