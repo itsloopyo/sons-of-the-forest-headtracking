@@ -142,7 +142,7 @@ PositionLimitZBack = 0.1
 # Default on: converts OpenTrack axes to Unity (verified for Sons of the Forest).
 InvertPositionX = true
 InvertPositionY = false
-InvertPositionZ = true
+InvertTrackerZ = false
 
 [Hotkeys]
 ToggleKey = End

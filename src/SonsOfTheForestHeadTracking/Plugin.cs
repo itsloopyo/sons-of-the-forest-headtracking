@@ -66,7 +66,7 @@ public class Plugin : BasePlugin
                 remoteSmoothing: config.RemoteSmoothing.Value,
                 invertX: config.InvertPositionX.Value,
                 invertY: config.InvertPositionY.Value,
-                invertZ: config.InvertPositionZ.Value)
+                invertZ: config.InvertTrackerZ.Value)
         };
 
         var session = new HeadTrackingSession(receiver, processor, positionProcessor)

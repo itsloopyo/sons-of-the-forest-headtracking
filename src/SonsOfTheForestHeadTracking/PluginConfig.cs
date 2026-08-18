@@ -26,7 +26,7 @@ public sealed class PluginConfig
     public ConfigEntry<float> PositionLimitZBack { get; }
     public ConfigEntry<bool> InvertPositionX { get; }
     public ConfigEntry<bool> InvertPositionY { get; }
-    public ConfigEntry<bool> InvertPositionZ { get; }
+    public ConfigEntry<bool> InvertTrackerZ { get; }
 
     public ConfigEntry<KeyCode> ToggleKey { get; }
     public ConfigEntry<KeyCode> RecenterKey { get; }
@@ -83,8 +83,12 @@ public sealed class PluginConfig
             "Invert lateral movement (default on: converts OpenTrack X to Unity, verified for Sons of the Forest).");
         InvertPositionY = cfg.Bind("Position", "InvertPositionY", false,
             "Invert vertical movement.");
-        InvertPositionZ = cfg.Bind("Position", "InvertPositionZ", true,
-            "Invert depth movement (default on: converts OpenTrack Z to Unity so leaning in moves the camera forward).");
+        // Renamed from InvertPositionZ, which every existing config file carries as true.
+        // It used to double as the conversion into Unity's +z-forward space, a job
+        // cameraunlock-core now does at the engine boundary; left in place it would invert
+        // the lean. The key has to change so those files re-default.
+        InvertTrackerZ = cfg.Bind("Position", "InvertTrackerZ", false,
+            "Invert depth movement (only for a tracker whose Z axis runs backwards).");
 
         ToggleKey = cfg.Bind("Hotkeys", "ToggleKey", KeyCode.End,
             "Toggle head tracking on/off.");
