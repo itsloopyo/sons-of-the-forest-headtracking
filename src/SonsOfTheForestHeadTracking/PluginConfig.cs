@@ -29,7 +29,6 @@ public sealed class PluginConfig
     public ConfigEntry<bool> InvertTrackerZ { get; }
 
     public ConfigEntry<KeyCode> ToggleKey { get; }
-    public ConfigEntry<KeyCode> RecenterKey { get; }
     public ConfigEntry<KeyCode> YawModeKey { get; }
     public ConfigEntry<KeyCode> PositionToggleKey { get; }
 
@@ -92,8 +91,6 @@ public sealed class PluginConfig
 
         ToggleKey = cfg.Bind("Hotkeys", "ToggleKey", KeyCode.End,
             "Toggle head tracking on/off.");
-        RecenterKey = cfg.Bind("Hotkeys", "RecenterKey", KeyCode.Home,
-            "Recenter head tracking to the current pose.");
         YawModeKey = cfg.Bind("Hotkeys", "YawModeKey", KeyCode.PageDown,
             "Toggle world-space vs camera-local yaw.");
         PositionToggleKey = cfg.Bind("Hotkeys", "PositionToggleKey", KeyCode.PageUp,

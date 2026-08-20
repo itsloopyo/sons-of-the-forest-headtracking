@@ -11,7 +11,7 @@ namespace SonsOfTheForestHeadTracking;
 /// <summary>
 /// Drives head tracking for Sons of the Forest (Unity 2022.2 IL2CPP + HDRP).
 ///
-/// The tracking pipeline (receiver -> interpolation -> processing, auto-recenter,
+/// The tracking pipeline (receiver -> interpolation -> processing,
 /// tracking-loss hold, mode cycling) lives in CameraUnlock.Core's
 /// <see cref="HeadTrackingSession"/>; the camera injection (multi-camera split
 /// matrix/transform writes) lives in <see cref="SplitInjectionCameraTracker"/>.
@@ -24,7 +24,9 @@ namespace SonsOfTheForestHeadTracking;
 public class HeadTrackingBehaviour : MonoBehaviour
 {
     private const int DiagnosticLogInterval = 120;
-    private const int GateLogInterval = 300;
+    // The pose dump answers "is tracker data flowing and does it look sane". Once
+    // answered it repeats forever, so it is capped rather than left periodic.
+    private const int DiagnosticLogBudget = 10;
 
     private HeadTrackingSession? _session;
     private PluginConfig? _config;
@@ -36,7 +38,8 @@ public class HeadTrackingBehaviour : MonoBehaviour
     private bool _hotkeysAvailable = true;
 
     private bool _wasTracking;
-    private bool _wasInWorld;
+    private int _diagnosticLogsRemaining = DiagnosticLogBudget;
+    private string? _lastGateReason;
 
     public HeadTrackingBehaviour(IntPtr ptr) : base(ptr) { }
 
@@ -64,12 +67,6 @@ public class HeadTrackingBehaviour : MonoBehaviour
                 Plugin.Logger.LogInfo($"Head tracking {(_trackingEnabled ? "ENABLED" : "DISABLED")}");
                 if (!_trackingEnabled) _tracker.ResetAll();
                 else _session.Reset();
-            }
-
-            if (ChordHotkeys.IsActionPressed(_config.RecenterKey.Value, ChordHotkeys.RecenterLetter))
-            {
-                _session.Recenter();
-                Plugin.Logger.LogInfo("Recentered.");
             }
 
             if (ChordHotkeys.IsActionPressed(_config.PositionToggleKey.Value, ChordHotkeys.PositionLetter))
@@ -116,7 +113,7 @@ public class HeadTrackingBehaviour : MonoBehaviour
         _tracker.RefreshTargetsIfDue();
         if (_tracker.TargetCount == 0) return;
 
-        // Session runs the whole pipeline: interpolation, processing, auto-recenter,
+        // Session runs the whole pipeline: interpolation, processing,
         // and tracking-loss hold. False only when no tracker data has ever arrived.
         if (!_session.Update(Time.deltaTime))
         {
@@ -136,11 +133,13 @@ public class HeadTrackingBehaviour : MonoBehaviour
         if (!_wasTracking)
         {
             _wasTracking = true;
+            _lastGateReason = null;
             Plugin.Logger.LogInfo($"Tracking ACTIVE on {_tracker.TargetCount} camera(s) (scene '{SceneManager.GetActiveScene().name}')");
         }
 
-        if (Time.frameCount % DiagnosticLogInterval == 0)
+        if (_diagnosticLogsRemaining > 0 && Time.frameCount % DiagnosticLogInterval == 0)
         {
+            _diagnosticLogsRemaining--;
             Plugin.Logger.LogInfo($"HT rot: Y={rotation.Yaw:F1} P={rotation.Pitch:F1} R={rotation.Roll:F1} " +
                 $"pos=({positionOffset.x:F3},{positionOffset.y:F3},{positionOffset.z:F3}) " +
                 $"mode={_session.Mode.Description()}{(_session.IsHolding ? " [holding]" : "")} ({_tracker.TargetCount} cams)");
@@ -148,19 +147,11 @@ public class HeadTrackingBehaviour : MonoBehaviour
     }
 
     /// <summary>
-    /// In-world (the game's own gameplay flag) and not paused. Auto-recenters when
-    /// entering the world so the spawn pose and seated position become the baseline.
+    /// In-world (the game's own gameplay flag) and not paused.
     /// </summary>
     private bool IsGameplay()
     {
         bool inWorld = LocalPlayer.IsInWorld;
-        if (inWorld && !_wasInWorld)
-        {
-            _session!.Recenter();
-            Plugin.Logger.LogInfo("Auto-recentered on entering world.");
-        }
-        _wasInWorld = inWorld;
-
         if (!inWorld)
         {
             LogGate("LocalPlayer.IsInWorld=false (menu/loading)");
@@ -176,9 +167,12 @@ public class HeadTrackingBehaviour : MonoBehaviour
         return true;
     }
 
+    // Logged on transitions only. Gates hold for as long as the player sits in a menu,
+    // so a periodic line here is an unbounded write for one unchanging fact.
     private void LogGate(string reason)
     {
-        if (Time.frameCount % GateLogInterval != 0) return;
+        if (reason == _lastGateReason) return;
+        _lastGateReason = reason;
         Plugin.Logger.LogInfo($"Tracking gated: {reason} [scene='{SceneManager.GetActiveScene().name}']");
     }
 

@@ -19,16 +19,28 @@ below; a dated entry is added when a versioned release is cut.
   -> position only.
 - World-space (horizon-locked) and camera-local yaw modes, switchable at
   runtime.
-- Gameplay gating on `LocalPlayer.IsInWorld` and `Time.timeScale`, with
-  auto-recenter on entering the world and a clean view restore when gated.
+- Gameplay gating on `LocalPlayer.IsInWorld` and `Time.timeScale`, with a clean
+  view restore when gated.
 - OpenTrack UDP receiver (port 4242) driving `HeadTrackingSession`:
   two-parameter smoothing (`LocalSmoothing` 0.0 / `RemoteSmoothing` 0.15,
   selected per connection from the packet source address), sample-rate
-  interpolation, auto-recenter on first connection, and tracking-loss hold.
-- Hotkeys (with Ctrl+Shift chord alternatives): End to toggle, Home to
-  recenter, Page Up to cycle tracking mode, Page Down to toggle yaw mode.
+  interpolation, and tracking-loss hold.
+- Hotkeys (with Ctrl+Shift chord alternatives): End to toggle, Page Up to
+  cycle tracking mode, Page Down to toggle yaw mode.
 
 ### Changed
+- `BepInEx/LogOutput.log` no longer fills with head-tracking chatter. The pose
+  dump that ran every 120 frames for the whole session now stops after 10
+  lines, and the "tracking gated" line is written when the gate changes instead
+  of every 300 frames. A long session used to add roughly 380 KB an hour of
+  repeated state.
+- The startup log now names the UDP port the mod listens on, so a report of
+  "no tracking" can be diagnosed from the log alone.
+- The mod no longer keeps a centre of its own and applies the tracker pose as
+  absolute. Every tracker app centres itself, so a mod-side centre sat in series
+  with the tracker's and the two drifted apart. Centre in your tracker app
+  instead. The recentre hotkey and its `RecenterKey` config entry are gone with
+  it.
 - Replaced the single `Smoothing` config key with `LocalSmoothing` (default
   0.0) and `RemoteSmoothing` (default 0.15), selected per connection from the
   packet source address.

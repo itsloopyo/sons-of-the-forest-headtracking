@@ -33,6 +33,7 @@ public class Plugin : BasePlugin
         var receiver = new OpenTrackReceiver();
         receiver.Log = msg => Logger.LogInfo(msg);
         receiver.Start(OpenTrackReceiver.DefaultPort);
+        Logger.LogInfo($"Listening for tracker data on UDP port {OpenTrackReceiver.DefaultPort}.");
 
         var processor = new TrackingProcessor
         {
@@ -92,6 +93,6 @@ public class Plugin : BasePlugin
             Logger.LogInfo("DebugFastBoot enabled - splash/intro VideoPlayers will be killed on each scene load.");
         }
 
-        Logger.LogInfo($"{PluginName} loaded. Press End to toggle, Home to recenter.");
+        Logger.LogInfo($"{PluginName} loaded. Press End to toggle tracking.");
     }
 }

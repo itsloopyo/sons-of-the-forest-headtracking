@@ -15,7 +15,7 @@ set "FRAMEWORK_TYPE=BepInEx"
 set "BEPINEX_ARCH=x64"
 set "BEPINEX_VENDOR_ZIP_NAME=BepInEx_UnityIL2CPP_x64.zip"
 set "BEPINEX_SUBFOLDER="
-set "MOD_CONTROLS=Controls:&echo   Home      or Ctrl+Shift+T - Recenter&echo   End       or Ctrl+Shift+Y - Toggle on/off&echo   Page Up   or Ctrl+Shift+G - Cycle tracking mode&echo   Page Down or Ctrl+Shift+H - Toggle yaw mode (world/local)"
+set "MOD_CONTROLS=Controls:&echo   End       or Ctrl+Shift+Y - Toggle on/off&echo   Page Up   or Ctrl+Shift+G - Cycle tracking mode&echo   Page Down or Ctrl+Shift+H - Toggle yaw mode (world/local)"
 :: --- END CONFIG BLOCK ---
 
 set "WRAPPER_DIR=%~dp0"

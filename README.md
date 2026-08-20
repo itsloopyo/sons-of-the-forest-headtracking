@@ -82,10 +82,13 @@ Two equivalent binding sets - use whichever your keyboard has:
 
 | Action              | Nav-cluster | Chord           |
 |---------------------|-------------|-----------------|
-| Recenter            | `Home`      | `Ctrl+Shift+T`  |
 | Toggle tracking     | `End`       | `Ctrl+Shift+Y`  |
 | Cycle tracking mode | `Page Up`   | `Ctrl+Shift+G`  |
 | Toggle yaw mode     | `Page Down` | `Ctrl+Shift+H`  |
+
+The mod applies the pose your tracker sends and keeps no centre of its own. To
+recentre, use the centre control in your tracker app: Center in opentrack,
+CENTER in Headcam, or the equivalent in whatever you run.
 
 `Page Up` / `Ctrl+Shift+G` cycles tracking mode:
 
@@ -146,7 +149,6 @@ InvertTrackerZ = false
 
 [Hotkeys]
 ToggleKey = End
-RecenterKey = Home
 YawModeKey = PageDown
 PositionToggleKey = PageUp
 ```
