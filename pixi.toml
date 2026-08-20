@@ -1,6 +1,6 @@
 [workspace]
 name = "sons-of-the-forest-head-tracking"
-version = "0.0.0"
+version = "0.1.0"
 description = "Head tracking mod for Sons of the Forest using CameraUnlock shared library"
 channels = ["conda-forge"]
 platforms = ["win-64"]

@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.1.0] - 2026-08-20
+
+### Fixed
+
+- show full control set in pixi install via shared -Controls
+- migrate to the per-connection smoothing pair in cameraunlock-core
+- restore the forward lean budget; InvertPositionZ becomes InvertTrackerZ
+- drop the mod-side centre and cut log noise
+
+### Other
+
+- Hello world
+- Ship launcher-manifest.json in installer ZIP and stamp version on release
+
 All notable changes to this project are documented here. Dev builds are
 published as a rolling `dev` pre-release and track the Unreleased section
 below; a dated entry is added when a versioned release is cut.

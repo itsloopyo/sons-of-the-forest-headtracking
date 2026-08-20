@@ -16,7 +16,7 @@ public class Plugin : BasePlugin
 {
     public const string PluginGuid = "com.cameraunlock.sonsoftheforest.headtracking";
     public const string PluginName = "Sons of the Forest Head Tracking";
-    public const string PluginVersion = "0.0.0";
+    public const string PluginVersion = "0.1.0";
 
     internal static ManualLogSource Logger = null!;
 
