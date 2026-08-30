@@ -6,9 +6,20 @@ on:
     tags:
       - 'v*.*.*'
 
+# Pinned to a cameraunlock-core commit SHA, not @main: that workflow runs with
+# contents:write, the Discord release webhook and the Lopari PAT, so at @main
+# whatever landed on core's default branch would run with all three.
+#
+# This mod stays on release-bepinex-mod.yml rather than the fleet-wide
+# release-mod.yml because scripts/setup-libs.ps1 resolves its compile
+# references by copying Il2CppInterop assemblies out of the user's game
+# install, so `pixi run package` cannot run on a runner that has no copy of
+# the game. Making those references game-independent is what moves this repo
+# onto release-mod.yml with everything else.
+
 jobs:
   release:
-    uses: itsloopyo/cameraunlock-core/.github/workflows/release-bepinex-mod.yml@main
+    uses: itsloopyo/cameraunlock-core/.github/workflows/release-bepinex-mod.yml@435915a8a3d8e1b799cc169b74f1fcf72b9534e7
     with:
       csproj-path: src/SonsOfTheForestHeadTracking/SonsOfTheForestHeadTracking.csproj
       project-name: "Head Tracking for Sons of the Forest"
