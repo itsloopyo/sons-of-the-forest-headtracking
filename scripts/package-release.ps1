@@ -166,6 +166,17 @@ if (Test-Path $nexusZipPath) { Remove-Item $nexusZipPath -Force }
 Write-Host ""
 Write-Host "Creating Nexus ZIP..." -ForegroundColor Cyan
 
+# The Nexus ZIP is a binary distribution too: the licences of everything
+# compiled into or bundled with the payload require their notices to travel
+# with it, so LICENSE and THIRD-PARTY-NOTICES.md ship at its root.
+foreach ($noticeDoc in @('LICENSE', 'THIRD-PARTY-NOTICES.md', 'README.md')) {
+    $noticeSrc = Join-Path $projectDir $noticeDoc
+    if (-not (Test-Path $noticeSrc)) {
+        throw "Required notice file not found: $noticeDoc. Every published ZIP is a binary distribution and must carry it."
+    }
+    Copy-Item $noticeSrc -Destination $nexusStagingDir -Force
+    Write-Host "  $noticeDoc" -ForegroundColor Green
+}
 Push-Location $nexusStagingDir
 try {
     Compress-Archive -Path ".\*" -DestinationPath $nexusZipPath -Force
