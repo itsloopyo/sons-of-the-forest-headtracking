@@ -1,17 +1,5 @@
 name: Build
 
-# This mod is BepInEx 6 IL2CPP. It compiles against Il2CppInterop proxy
-# assemblies (UnityEngine.*, Il2Cpp*, Sons.dll, Endnight.dll) that only exist
-# after the game is installed and launched once with BepInEx, and that are
-# gitignored / never committed per the repo's no-game-code rule. A
-# GitHub-hosted runner has no game install, so it cannot generate those refs
-# and therefore cannot compile or package this mod. Building, packaging, and
-# releasing are local-only (scripts/release.ps1 builds locally and commits
-# prebuilt/ DLLs; release.yml then zips those committed DLLs - it never
-# recompiles). This per-push job is intentionally a validate-only gate: it
-# runs every check that does NOT require the game. That is why it does not
-# upload an installer artifact, unlike the catalogue-wide build.yml contract.
-
 on:
   push:
     branches: ['**']
@@ -27,9 +15,15 @@ on:
       - 'LICENSE'
 
 jobs:
-  validate:
-    name: Validate
+  build:
+    name: Build and Validate
     runs-on: windows-latest
+    # Checkout and artifact upload only. Without this the job inherits the
+    # repository default, which on repos created before the read-only default
+    # hands every push - including one from a fork's PR head - a token that can
+    # write contents, packages and releases.
+    permissions:
+      contents: read
     if: ${{ !startsWith(github.event.head_commit.message, 'Release v') }}
 
     steps:
@@ -38,19 +32,34 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Validate repo consistency
-        shell: pwsh
-        run: |
-          powershell -ExecutionPolicy Bypass -File scripts/validate-repo.ps1
-          if ($LASTEXITCODE -ne 0) {
-            Write-Host "::error::Repo validation failed"
-            exit 1
-          }
-
       - name: Setup .NET
         uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5.4.0
         with:
           dotnet-version: '8.0.x'
 
-      - name: Restore NuGet packages
-        run: dotnet restore src/SonsOfTheForestHeadTracking/SonsOfTheForestHeadTracking.csproj
+      - name: Setup pixi
+        uses: prefix-dev/setup-pixi@5185adfbffb4bd703da3010310260805d89ebb11 # v0.9.6
+
+      # Same pixi task a developer runs, and ahead of packaging so a failure
+      # blocks the artifact rather than shipping beside it.
+      - name: Test
+        shell: pwsh
+        run: pixi run test
+
+      # Build + package through the SAME command a developer runs locally. Every
+      # build dependency is produced by scripts/setup-libs.ps1 inside the pixi
+      # task chain - no build logic lives in this workflow, so local and CI
+      # can't drift. This runner has no Sons of the Forest install, which is the
+      # only check that catches a stub drifting from the shipped interop shape.
+      - name: Build and package
+        shell: pwsh
+        run: pixi run package
+
+      - name: Verify installer was produced
+        shell: pwsh
+        run: |
+          $zip = Get-ChildItem release/*-installer.zip -ErrorAction SilentlyContinue | Select-Object -First 1
+          if (-not $zip) {
+            Write-Host "::error::No installer ZIP was produced by 'pixi run package'"
+            exit 1
+          }

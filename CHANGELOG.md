@@ -43,6 +43,18 @@ below; a dated entry is added when a versioned release is cut.
   cycle tracking mode, Page Down to toggle yaw mode.
 
 ### Changed
+- Building no longer needs Sons of the Forest installed. `scripts/setup-libs.ps1`
+  used to copy its compile references out of `<game>/BepInEx/core` and
+  `<game>/BepInEx/interop`, so a contributor without the game, and CI, could not
+  build at all. It now resolves BepInEx from the vendored loader archive,
+  Il2CppInterop from NuGet, and the Il2CppInterop-shaped UnityEngine modules and
+  `Sons` from checked-in stub sources. The built assembly's external references
+  are byte-identical to the game-built one, member for member and signature for
+  signature; only the Il2CppInterop.Runtime reference moves, from the 1.5.1 in a
+  local game install to the 1.5.3 the vendored BepInEx actually ships.
+- `.github/workflows/build.yml` builds and packages through `pixi run package`
+  instead of only validating, which is what catches a stub drifting from the
+  shipped interop shape.
 - `BepInEx/LogOutput.log` no longer fills with head-tracking chatter. The pose
   dump that ran every 120 frames for the whole session now stops after 10
   lines, and the "tracking gated" line is written when the gate changes instead

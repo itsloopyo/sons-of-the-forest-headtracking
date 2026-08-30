@@ -223,7 +223,7 @@ Run `uninstall.cmd`. This removes the mod DLLs. BepInEx is only removed if the i
 
 ## Building from Source
 
-Prerequisites: Windows, [pixi](https://pixi.sh), and a local Sons of the Forest install (the build references the game's IL2CPP interop assemblies).
+Prerequisites: Windows and [pixi](https://pixi.sh). No game install is needed: `scripts/setup-libs.ps1` resolves every compile reference from the vendored BepInEx archive, NuGet, and the checked-in stub sources.
 
 ```powershell
 git clone --recursive https://github.com/itsloopyo/sons-of-the-forest-headtracking
