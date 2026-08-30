@@ -1,0 +1,45 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Reference-only stub for the game's Sons.dll, so the mod builds with no game
+       installed. Game-specific, so it lives here rather than in cameraunlock-core, whose
+       csharp/stubs/il2cpp holds only the engine modules every IL2CPP mod shares.
+
+       scripts/setup-libs.ps1 builds this project and copies the output into
+       src/SonsOfTheForestHeadTracking/libs/. -->
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <AssemblyName>Sons</AssemblyName>
+    <RootNamespace>TheForest.Utils</RootNamespace>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <AssemblyVersion>0.0.0.0</AssemblyVersion>
+    <IsPackable>false</IsPackable>
+    <DebugType>none</DebugType>
+    <NoWarn>CS0169;CS0649;CS0067;CS0660;CS0661;CS0108;CS0114;MSB3277</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\SonsStubs.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\cameraunlock-core\csharp\stubs\il2cpp\UnityEngine.CoreModule\Stubs.UnityEngine.CoreModule.csproj" Private="false" />
+  </ItemGroup>
+
+  <!-- LocalPlayer's base chain runs up to Il2CppSystem.Object, so the compiler needs
+       Il2Cppmscorlib to resolve it. Taken by path rather than as package assets because
+       Il2CppInterop.ReferenceLibs also ships a UnityEngine.CoreModule-nstrip.dll whose
+       assembly name collides with the CoreModule stub above. -->
+  <ItemGroup>
+    <PackageReference Include="Il2CppInterop.ReferenceLibs" Version="1.0.0"
+                      GeneratePathProperty="true" ExcludeAssets="all" />
+    <Reference Include="Il2Cppmscorlib">
+      <HintPath>$(PkgIl2CppInterop_ReferenceLibs)\lib\net6.0\Il2Cppmscorlib.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+</Project>
