@@ -27,7 +27,7 @@ Sons of the Forest.
 | SemanticVersioning | with BepInEx 6.0.0-be.785 | MIT | Inside the bundled BepInEx archive |
 | Dobby | with BepInEx 6.0.0-be.785 | Apache-2.0 | Inside the bundled BepInEx archive (`dobby.dll`) |
 | .NET runtime | with BepInEx 6.0.0-be.785 | MIT | Inside the bundled BepInEx archive |
-| cameraunlock-core | fec3b4c8a6fe9c45401cf65d3d43d4f5acd22b72 | MIT | Compiled into `SonsOfTheForestHeadTracking.dll` |
+| cameraunlock-core | f441e29427b7422a584ba492dddd7788881804b0 | MIT | Compiled into `SonsOfTheForestHeadTracking.dll` |
 | OpenTrack | n/a | ISC | Not bundled; UDP protocol interoperability only |
 
 ---
@@ -1531,11 +1531,11 @@ SOFTWARE.
 The MIT License (MIT)
 =====================
 
-Copyright Ãƒâ€šÃ‚Â© `2016-2026 Washi`
+Copyright ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â© `2016-2026 Washi`
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation
-files (the ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œSoftwareÃƒÂ¢Ã¢â€šÂ¬Ã‚Â), to deal in the Software without
+files (the ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã¢â‚¬Å“SoftwareÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â), to deal in the Software without
 restriction, including without limitation the rights to use,
 copy, modify, merge, publish, distribute, sublicense, and/or sell
 copies of the Software, and to permit persons to whom the
@@ -1545,7 +1545,7 @@ conditions:
 The above copyright notice and this permission notice shall be
 included in all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œAS ISÃƒÂ¢Ã¢â€šÂ¬Ã‚Â, WITHOUT WARRANTY OF ANY KIND,
+THE SOFTWARE IS PROVIDED ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã¢â‚¬Å“AS ISÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â, WITHOUT WARRANTY OF ANY KIND,
 EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
 OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
 NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
@@ -1772,7 +1772,7 @@ SOFTWARE.
 Git submodule at `cameraunlock-core/`, compiled into `SonsOfTheForestHeadTracking.dll`. Our own code,
 MIT licensed, reproduced here so the notices are complete.
 
-- Pinned commit: `fec3b4c8a6fe9c45401cf65d3d43d4f5acd22b72`
+- Pinned commit: `f441e29427b7422a584ba492dddd7788881804b0`
 
 ```
 MIT License
