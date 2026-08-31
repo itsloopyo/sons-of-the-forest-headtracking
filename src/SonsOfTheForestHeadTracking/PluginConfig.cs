@@ -47,10 +47,10 @@ public sealed class PluginConfig
             new ConfigDescription("Pitch sensitivity multiplier.", new AcceptableValueRange<float>(-5f, 5f)));
         RollSensitivity = cfg.Bind("Sensitivity", "RollSensitivity", 1.0f,
             new ConfigDescription("Roll sensitivity multiplier.", new AcceptableValueRange<float>(-5f, 5f)));
-        LocalSmoothing = cfg.Bind("Smoothing", "LocalSmoothing", 0.0f,
+        LocalSmoothing = cfg.Bind("Smoothing", "LocalSmoothing", CameraUnlock.Core.Math.SmoothingUtils.DefaultLocalSmoothing,
             new ConfigDescription("Smoothing applied when the tracker runs on this machine (loopback). 0 = no smoothing, 1 = heavy. Covers rotation and position.",
                 new AcceptableValueRange<float>(0f, 1f)));
-        RemoteSmoothing = cfg.Bind("Smoothing", "RemoteSmoothing", 0.15f,
+        RemoteSmoothing = cfg.Bind("Smoothing", "RemoteSmoothing", CameraUnlock.Core.Math.SmoothingUtils.DefaultRemoteSmoothing,
             new ConfigDescription("Smoothing applied when the tracker is a remote device on the network. 0 = no smoothing, 1 = heavy. Covers rotation and position.",
                 new AcceptableValueRange<float>(0f, 1f)));
 
@@ -69,13 +69,13 @@ public sealed class PluginConfig
             new ConfigDescription("Vertical (up/down) position sensitivity.", new AcceptableValueRange<float>(0f, 5f)));
         PositionSensitivityZ = cfg.Bind("Position", "PositionSensitivityZ", 1.0f,
             new ConfigDescription("Depth (lean in/out) position sensitivity.", new AcceptableValueRange<float>(0f, 5f)));
-        PositionLimitX = cfg.Bind("Position", "PositionLimitX", 0.30f,
+        PositionLimitX = cfg.Bind("Position", "PositionLimitX", CameraUnlock.Core.Data.PositionSettings.Default.LimitX,
             new ConfigDescription("Maximum lateral displacement in meters.", new AcceptableValueRange<float>(0.01f, 0.5f)));
-        PositionLimitY = cfg.Bind("Position", "PositionLimitY", 0.20f,
+        PositionLimitY = cfg.Bind("Position", "PositionLimitY", CameraUnlock.Core.Data.PositionSettings.Default.LimitY,
             new ConfigDescription("Maximum vertical displacement in meters.", new AcceptableValueRange<float>(0.01f, 0.5f)));
-        PositionLimitZ = cfg.Bind("Position", "PositionLimitZ", 0.40f,
+        PositionLimitZ = cfg.Bind("Position", "PositionLimitZ", CameraUnlock.Core.Data.PositionSettings.Default.LimitZ,
             new ConfigDescription("Maximum forward lean in meters.", new AcceptableValueRange<float>(0.01f, 0.5f)));
-        PositionLimitZBack = cfg.Bind("Position", "PositionLimitZBack", 0.10f,
+        PositionLimitZBack = cfg.Bind("Position", "PositionLimitZBack", CameraUnlock.Core.Data.PositionSettings.Default.LimitZBack,
             new ConfigDescription("Maximum backward lean in meters (small, prevents clipping into the player).",
                 new AcceptableValueRange<float>(0.01f, 0.5f)));
         InvertPositionX = cfg.Bind("Position", "InvertPositionX", true,
