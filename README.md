@@ -14,6 +14,7 @@ An unofficial head tracking mod for Sons of the Forest that moves the view with 
 
 - **Decoupled look and aim** - head tracking moves the camera; aim stays on your mouse/controller
 - **6DOF positional tracking** - lean and peek with head position
+- **Works with any OpenTrack compatible tracker** - free options available for PC, iOS and Android
 
 ## Requirements
 
@@ -22,6 +23,13 @@ An unofficial head tracking mod for Sons of the Forest that moves the view with 
 - Windows 10/11, 64-bit
 
 ## Installation
+
+### Lopari
+
+Download [Lopari](https://lopari.app), choose **Sons of the Forest**, and click
+**Play with head tracking**.
+
+### Standalone Installer
 
 1. Download the latest `SonsOfTheForestHeadTracking-vX.Y.Z-installer.zip` from the [Releases page](https://github.com/itsloopyo/sons-of-the-forest-headtracking/releases).
 2. Extract it anywhere.
