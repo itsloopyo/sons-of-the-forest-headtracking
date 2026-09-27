@@ -1,0 +1,29 @@
+# What the differential test compares, and where each file came from.
+# Columns: role, source (commit:path, a release asset, or the path in this repo), sha256 of the bytes.
+# The one published build is the rolling dev pre-release, 0.1.0-nightly.20260820.cac1dc5, built
+# from cac1dc5, the commit tagged v0.1.0 (no v0.1.0 GitHub release was published). There is no
+# predecessor repo. src/SonsOfTheForestHeadTracking/PluginConfig.cs is the reader that build read
+# the .cfg with. At 70ebd87, the commit the reader in src/SonsOfTheForestHeadTracking/Legacy was
+# frozen from, the file differs only by a532e97, which took the smoothing and limit defaults from
+# core's constants of the same values; the frozen reader holds them as literals in LegacyConfig,
+# fills it and writes nothing. It uses no core code. The oracle is the cac1dc5 file byte for byte.
+published reader	cac1dc5:src/SonsOfTheForestHeadTracking/PluginConfig.cs	ee83fcee3dc862bb88f25bdd97610485aa59c395e745849a8d447a1b9c8bec5d
+frozen from	70ebd87:src/SonsOfTheForestHeadTracking/PluginConfig.cs	d67b33ccf2b3c03edaa19cabf80e49905ed618569ecc200f7c912a14d44e55bf
+oracle copy	tests/config_differential/oracle/PluginConfig.cs	ee83fcee3dc862bb88f25bdd97610485aa59c395e745849a8d447a1b9c8bec5d
+frozen reader	src/SonsOfTheForestHeadTracking/Legacy/LegacyConfig.cs	1d9e1b829b3dc8aaa5d3e4b287e7f1d625e2399a8bb791b85807e53f0dd07ed8
+frozen reader	src/SonsOfTheForestHeadTracking/Legacy/LegacyConfigReader.cs	46b84a15fdeaf676c80bfe1e2faeb895f234f245bd791d139e0ddb442568bbfe
+frozen reader	src/SonsOfTheForestHeadTracking/Legacy/LegacyConfigKeys.cs	ef41ccc137df82f260e884c9628fd441f623a513386f50fd838449d34a69cdf9
+BepInEx 6	vendor/bepinex/BepInEx_UnityIL2CPP_x64.zip	2a7cbf74d26abe4765c3e662db1721b923bac39849ebfef2ca5dc7de7e2d9b7f
+# BepInEx 6.0.0-be.785. The test, and the first-run harness below, ran its BepInEx/core/BepInEx.Core.dll
+# (sha256 352aacc2d5356489a00891f76db28b6463c81d25bcb02f90035171a669b7e35b), which the game loads.
+# No published build shipped the plugin .cfg, in its ZIP or as a launcher-manifest.json seed (the one
+# seed is the loader's BepInEx.cfg), so the input is what the build writes at its first start: the .cfg
+# its own SonsOfTheForestHeadTracking.dll, taken from the dev pre-release's installer ZIP (the ZIP's
+# SHA-256 checked against the digest GitHub reports for the asset), writes when its PluginConfig
+# constructor runs on a ConfigFile at a path with no file and the plugin's BepInPlugin metadata
+# (com.cameraunlock.sonsoftheforest.headtracking, Sons of the Forest Head Tracking, 0.1.0), as
+# BasePlugin builds it. It ran on .NET 8 with that BepInEx.Core.dll and core's IL2CPP stub of
+# UnityEngine.CoreModule for KeyCode. The "Acceptable values" comment lines list the stub's KeyCode
+# enum; in game they list the one the game's interop assemblies hold. No reader reads a comment line.
+input source	release dev SonsOfTheForestHeadTracking-dev-installer.zip 7447bd5eaa895c87c42739a486807e02ad00fef9098cf2dea7070da674cca5a3 plugins/SonsOfTheForestHeadTracking.dll 1529b067910e9596719062397381c4b6eae337427a47f428f36a0c9f55a06b33	-
+input	tests/config_differential/data/first-run/dev.cfg	7aa722a96edcff920b59e57a724d5c591d77c1fa2748df18fdf5abf41b5e2054

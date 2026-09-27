@@ -12,9 +12,13 @@ restore = "dotnet restore src/SonsOfTheForestHeadTracking/SonsOfTheForestHeadTra
 setup = { cmd = "powershell -ExecutionPolicy Bypass -File scripts/setup-libs.ps1", depends-on = ["restore"] }
 build = { cmd = "dotnet build src/SonsOfTheForestHeadTracking/SonsOfTheForestHeadTracking.csproj -c Release", depends-on = ["setup"] }
 install = { cmd = "powershell -ExecutionPolicy Bypass -File scripts/deploy.ps1 Release", depends-on = ["build"] }
-package = { cmd = "powershell -ExecutionPolicy Bypass -File scripts/package-release.ps1", depends-on = ["build"] }
+package = { cmd = "powershell -ExecutionPolicy Bypass -File scripts/package-release.ps1", depends-on = ["test"] }
 uninstall = "scripts\\uninstall.cmd"
-test = "powershell -ExecutionPolicy Bypass -File scripts/validate-repo.ps1"
+# The repo checks, then the config tests, among them the differential test in
+# tests/config_differential, which holds the frozen legacy reader to the published build's own
+# reader on its first-run file and on core's mutation corpus. What the mod does to the camera is
+# checked by an in-game pass.
+test = { cmd = "powershell -ExecutionPolicy Bypass -File scripts/validate-repo.ps1 && dotnet test tests/SonsOfTheForestHeadTracking.Tests/SonsOfTheForestHeadTracking.Tests.csproj -c Release", depends-on = ["build"] }
 clean = "dotnet clean src/SonsOfTheForestHeadTracking/SonsOfTheForestHeadTracking.csproj"
 
 # Bump vendored mod-loader copies to latest upstream. Manual; commit the result.

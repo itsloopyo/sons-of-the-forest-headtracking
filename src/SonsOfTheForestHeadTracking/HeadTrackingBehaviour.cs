@@ -2,6 +2,7 @@ using System;
 using CameraUnlock.Core.Tracking;
 using CameraUnlock.Core.Unity.Extensions;
 using CameraUnlock.Core.Unity.Il2Cpp;
+using SonsOfTheForestHeadTracking.Configuration;
 using TheForest.Utils;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -29,7 +30,7 @@ public class HeadTrackingBehaviour : MonoBehaviour
     private const int DiagnosticLogBudget = 10;
 
     private HeadTrackingSession? _session;
-    private PluginConfig? _config;
+    private ModConfig? _config;
     private SplitInjectionCameraTracker? _tracker;
 
     private bool _trackingEnabled = true;
@@ -43,13 +44,13 @@ public class HeadTrackingBehaviour : MonoBehaviour
 
     public HeadTrackingBehaviour(IntPtr ptr) : base(ptr) { }
 
-    public void Initialize(HeadTrackingSession session, PluginConfig config)
+    internal void Initialize(HeadTrackingSession session, ModConfig config)
     {
         _session = session;
         _config = config;
         _tracker = new SplitInjectionCameraTracker { Log = msg => Plugin.Logger.LogInfo(msg) };
-        _trackingEnabled = config.EnabledOnStartup.Value;
-        _worldSpaceYaw = config.WorldSpaceYaw.Value;
+        _trackingEnabled = config.EnabledOnStartup;
+        _worldSpaceYaw = config.WorldSpaceYaw;
         _initialized = true;
 
         Plugin.Logger.LogInfo("HeadTrackingBehaviour initialized (split matrix/transform injection in LateUpdate).");
@@ -61,7 +62,7 @@ public class HeadTrackingBehaviour : MonoBehaviour
 
         try
         {
-            if (ChordHotkeys.IsActionPressed(_config.ToggleKey.Value, ChordHotkeys.ToggleLetter))
+            if (ChordHotkeys.IsActionPressed(_config.ToggleKey, ChordHotkeys.ToggleLetter))
             {
                 _trackingEnabled = !_trackingEnabled;
                 Plugin.Logger.LogInfo($"Head tracking {(_trackingEnabled ? "ENABLED" : "DISABLED")}");
@@ -69,14 +70,14 @@ public class HeadTrackingBehaviour : MonoBehaviour
                 else _session.Reset();
             }
 
-            if (ChordHotkeys.IsActionPressed(_config.PositionToggleKey.Value, ChordHotkeys.PositionLetter))
+            if (ChordHotkeys.IsActionPressed(_config.PositionToggleKey, ChordHotkeys.PositionLetter))
             {
                 TrackingMode mode = _session.CycleMode();
                 if (!_session.RotationActive) _tracker.ResetMatrices();
                 Plugin.Logger.LogInfo($"Tracking mode: {mode.Description()}");
             }
 
-            if (ChordHotkeys.IsActionPressed(_config.YawModeKey.Value, ChordHotkeys.FourthToggleLetter))
+            if (ChordHotkeys.IsActionPressed(_config.YawModeKey, ChordHotkeys.FourthToggleLetter))
             {
                 _worldSpaceYaw = !_worldSpaceYaw;
                 Plugin.Logger.LogInfo($"Yaw mode: {(_worldSpaceYaw ? "world-space (horizon-locked)" : "camera-local")}");

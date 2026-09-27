@@ -7,6 +7,8 @@ using CameraUnlock.Core.Protocol;
 using CameraUnlock.Core.Tracking;
 using CameraUnlock.Core.Unity.Il2Cpp;
 using Il2CppInterop.Runtime.Injection;
+using SonsOfTheForestHeadTracking.Configuration;
+using SonsOfTheForestHeadTracking.Legacy;
 using UnityEngine;
 
 namespace SonsOfTheForestHeadTracking;
@@ -28,7 +30,7 @@ public class Plugin : BasePlugin
         Logger = Log;
         Logger.LogInfo($"Loading {PluginName} v{PluginVersion}...");
 
-        var config = new PluginConfig(Config);
+        var config = LoadConfig();
 
         var receiver = new OpenTrackReceiver();
         receiver.Log = msg => Logger.LogInfo(msg);
@@ -40,15 +42,15 @@ public class Plugin : BasePlugin
             // Selected per connection by HeadTrackingSession, which re-reads locality
             // from the receiver every Update: loopback senders get LocalSmoothing,
             // remote network devices get RemoteSmoothing.
-            LocalSmoothing = config.LocalSmoothing.Value,
-            RemoteSmoothing = config.RemoteSmoothing.Value,
+            LocalSmoothing = config.LocalSmoothing,
+            RemoteSmoothing = config.RemoteSmoothing,
             Sensitivity = new SensitivitySettings(
-                config.YawSensitivity.Value,
-                config.PitchSensitivity.Value,
-                config.RollSensitivity.Value,
-                invertYaw: config.InvertYaw.Value,
-                invertPitch: config.InvertPitch.Value,
-                invertRoll: config.InvertRoll.Value
+                config.YawSensitivity,
+                config.PitchSensitivity,
+                config.RollSensitivity,
+                invertYaw: config.InvertYaw,
+                invertPitch: config.InvertPitch,
+                invertRoll: config.InvertRoll
             ),
             Deadzone = DeadzoneSettings.None
         };
@@ -56,23 +58,23 @@ public class Plugin : BasePlugin
         var positionProcessor = new PositionProcessor
         {
             Settings = PositionSettings.Symmetric(
-                config.PositionSensitivityX.Value,
-                config.PositionSensitivityY.Value,
-                config.PositionSensitivityZ.Value,
-                config.PositionLimitX.Value,
-                config.PositionLimitY.Value,
-                config.PositionLimitZ.Value,
-                config.PositionLimitZBack.Value,
-                localSmoothing: config.LocalSmoothing.Value,
-                remoteSmoothing: config.RemoteSmoothing.Value,
-                invertX: config.InvertPositionX.Value,
-                invertY: config.InvertPositionY.Value,
-                invertZ: config.InvertTrackerZ.Value)
+                config.PositionSensitivityX,
+                config.PositionSensitivityY,
+                config.PositionSensitivityZ,
+                config.PositionLimitX,
+                config.PositionLimitY,
+                config.PositionLimitZ,
+                config.PositionLimitZBack,
+                localSmoothing: config.LocalSmoothing,
+                remoteSmoothing: config.RemoteSmoothing,
+                invertX: config.InvertPositionX,
+                invertY: config.InvertPositionY,
+                invertZ: config.InvertTrackerZ)
         };
 
         var session = new HeadTrackingSession(receiver, processor, positionProcessor)
         {
-            Mode = config.PositionEnabled.Value ? TrackingMode.RotationAndPosition : TrackingMode.RotationOnly,
+            Mode = config.PositionEnabled ? TrackingMode.RotationAndPosition : TrackingMode.RotationOnly,
             Log = msg => Logger.LogInfo(msg)
         };
 
@@ -86,7 +88,7 @@ public class Plugin : BasePlugin
         _host = _hostObject.AddComponent<HeadTrackingBehaviour>();
         _host.Initialize(session, config);
 
-        if (config.DebugFastBoot.Value)
+        if (config.DebugFastBoot)
         {
             FastBootBehaviour.Log = msg => Logger.LogInfo(msg);
             _hostObject.AddComponent<FastBootBehaviour>();
@@ -94,5 +96,43 @@ public class Plugin : BasePlugin
         }
 
         Logger.LogInfo($"{PluginName} loaded. Press End to toggle tracking.");
+    }
+
+    /// <summary>
+    /// Reads the plugin's .cfg through the frozen reader, then saves it once, the write every
+    /// published build's Bind calls made at each start, so the file on disk stays what it was.
+    /// </summary>
+    private ModConfig LoadConfig()
+    {
+        LegacyConfig legacy = LegacyConfigReader.Read(Config, out _);
+        Config.Save();
+        return new ModConfig
+        {
+            EnabledOnStartup = legacy.EnabledOnStartup,
+            WorldSpaceYaw = legacy.WorldSpaceYaw,
+            YawSensitivity = legacy.YawSensitivity,
+            PitchSensitivity = legacy.PitchSensitivity,
+            RollSensitivity = legacy.RollSensitivity,
+            LocalSmoothing = legacy.LocalSmoothing,
+            RemoteSmoothing = legacy.RemoteSmoothing,
+            InvertYaw = legacy.InvertYaw,
+            InvertPitch = legacy.InvertPitch,
+            InvertRoll = legacy.InvertRoll,
+            PositionEnabled = legacy.PositionEnabled,
+            PositionSensitivityX = legacy.PositionSensitivityX,
+            PositionSensitivityY = legacy.PositionSensitivityY,
+            PositionSensitivityZ = legacy.PositionSensitivityZ,
+            PositionLimitX = legacy.PositionLimitX,
+            PositionLimitY = legacy.PositionLimitY,
+            PositionLimitZ = legacy.PositionLimitZ,
+            PositionLimitZBack = legacy.PositionLimitZBack,
+            InvertPositionX = legacy.InvertPositionX,
+            InvertPositionY = legacy.InvertPositionY,
+            InvertTrackerZ = legacy.InvertTrackerZ,
+            ToggleKey = legacy.ToggleKey,
+            YawModeKey = legacy.YawModeKey,
+            PositionToggleKey = legacy.PositionToggleKey,
+            DebugFastBoot = legacy.DebugFastBoot,
+        };
     }
 }

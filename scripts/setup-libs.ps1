@@ -100,3 +100,23 @@ foreach ($relative in $stubProjects) {
 $dlls = Get-ChildItem $libsPath -Filter '*.dll'
 Write-Host "Populated $($dlls.Count) DLLs in $libsPath" -ForegroundColor Green
 $dlls | ForEach-Object { Write-Host "  $($_.Name)" -ForegroundColor Gray }
+
+# The config tests run the legacy .cfg import on the BepInEx.Core the game runs, the one in the
+# vendored loader archive. The published reader the differential test runs saves, and
+# ConfigFile.Save loads SemanticVersioning.
+$testLibsPath = Join-Path $projectRoot "tests/SonsOfTheForestHeadTracking.Tests/libs"
+New-Item -ItemType Directory -Path $testLibsPath -Force | Out-Null
+Get-ChildItem $testLibsPath -Filter '*.dll' -File | Remove-Item -Force
+
+$archive = [System.IO.Compression.ZipFile]::OpenRead($vendorZip)
+try {
+    foreach ($name in @('BepInEx.Core.dll', 'SemanticVersioning.dll')) {
+        $entry = $archive.Entries | Where-Object { $_.FullName -eq "BepInEx/core/$name" }
+        if (-not $entry) { throw "Vendored BepInEx zip has no BepInEx/core/$name" }
+        [System.IO.Compression.ZipFileExtensions]::ExtractToFile($entry, (Join-Path $testLibsPath $name), $true)
+    }
+}
+finally {
+    $archive.Dispose()
+}
+Write-Host "Extracted the vendored BepInEx.Core.dll and SemanticVersioning.dll into $testLibsPath" -ForegroundColor Green
