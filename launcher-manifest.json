@@ -29,6 +29,14 @@
     { "source": "plugins/CameraUnlock.Core.dll", "target": "BepInEx/plugins/CameraUnlock.Core.dll" }
   ],
 
+  "config": {
+    "path": "BepInEx/config/CameraUnlock.ini",
+    "anchor": "game_root",
+    "legacy_source": "BepInEx/config/com.cameraunlock.sonsoftheforest.headtracking.cfg",
+    "canonical_since": "0.2.0",
+    "per_game": {}
+  },
+
   "runtime_requirements": [],
   "dependencies": []
 }
