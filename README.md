@@ -2,13 +2,7 @@
 
 ![Sons of the Forest running with this mod](https://raw.githubusercontent.com/itsloopyo/sons-of-the-forest-headtracking/main/assets/readme-clip.gif)
 
-An unofficial head tracking mod for Sons of the Forest that moves the view with your head while your mouse or controller keeps aiming, driven by OpenTrack over UDP, with no VR headset required.
-
-> [!CAUTION]
-> **Experimental prototype - expect missing core features.**
-> Head-tracked rotation and 6DOF position are working in-game, but on-screen
-> reticle compensation is not yet implemented. Comfort tuning and edge cases
-> are still in progress.
+An unofficial head tracking mod for Sons of the Forest that moves the view with your head while your mouse or controller keeps aiming, driven by a webcam, phone, or any OpenTrack compatible tracker, with no VR headset required.
 
 ## Features
 
@@ -219,7 +213,7 @@ PositionToggleKey = PageUp
 
 **Crosshair drifts when looking around**
 
-- Aim stays on the mouse by design; on-screen reticle compensation is not yet implemented in this prototype.
+- Aim stays on the mouse by design. The mod does not move the game's reticle, so with your head turned the aim point sits away from the centre of the screen.
 
 ## Updating
 
