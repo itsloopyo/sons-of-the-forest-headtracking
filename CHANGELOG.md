@@ -20,6 +20,8 @@ below; a dated entry is added when a versioned release is cut.
 
 ## [Unreleased]
 
+**Settings have moved.** This version keeps its settings in `BepInEx\config\CameraUnlock.ini`. The first time it starts it reads your settings from the old `BepInEx\config\com.cameraunlock.sonsoftheforest.headtracking.cfg` into the new file, and leaves the old file as it was. BepInEx's ConfigurationManager no longer lists the settings: edit `CameraUnlock.ini` with any text editor. The entries under Changed have the details.
+
 ### Added
 - A setting set to `default` in `CameraUnlock.ini` takes its value from `Defaults.ini`, which every head tracking mod that keeps its settings in `CameraUnlock.ini` reads. Head tracking mods that keep their settings in another file do not read it, and neither do earlier versions of this mod. Writing a value in place of `default` changes that setting for this game only. When the mod saves a setting that a hotkey changed in game, it writes the new value in place of `default`, so that setting no longer follows `Defaults.ini` in this game until you set it to `default` again.
 - `Defaults.ini` is `%AppData%\CameraUnlock\Defaults.ini` on Windows; `$XDG_CONFIG_HOME/CameraUnlock/Defaults.ini` on Linux, or `~/.config/CameraUnlock/Defaults.ini` where `XDG_CONFIG_HOME` is not set, under Wine and Proton too; and `~/Library/Application Support/CameraUnlock/Defaults.ini` on macOS. The mod's log, where it writes one, names the file it read.
