@@ -27,7 +27,7 @@ Sons of the Forest.
 | SemanticVersioning | with BepInEx 6.0.0-be.785 | MIT | Inside the bundled BepInEx archive |
 | Dobby | with BepInEx 6.0.0-be.785 | Apache-2.0 | Inside the bundled BepInEx archive (`dobby.dll`) |
 | .NET runtime | with BepInEx 6.0.0-be.785 | MIT | Inside the bundled BepInEx archive |
-| cameraunlock-core | f441e29427b7422a584ba492dddd7788881804b0 | MIT | Compiled into `SonsOfTheForestHeadTracking.dll` |
+| cameraunlock-core | 33f3199499f1bbb0966634a54581b511844f2b15 | MIT | Compiled into `SonsOfTheForestHeadTracking.dll` |
 | OpenTrack | n/a | ISC | Not bundled; UDP protocol interoperability only |
 
 ---
@@ -1772,7 +1772,7 @@ SOFTWARE.
 Git submodule at `cameraunlock-core/`, compiled into `SonsOfTheForestHeadTracking.dll`. Our own code,
 MIT licensed, reproduced here so the notices are complete.
 
-- Pinned commit: `f441e29427b7422a584ba492dddd7788881804b0`
+- Pinned commit: `33f3199499f1bbb0966634a54581b511844f2b15`
 
 ```
 MIT License
