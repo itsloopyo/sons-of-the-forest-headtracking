@@ -120,6 +120,13 @@ try {
     exit 1
 }
 
+try {
+    Assert-ReleaseNotBelowCanonicalSince -RepoRoot $projectDir -Version $Version
+} catch {
+    Write-Host "Error: $($_.Exception.Message)" -ForegroundColor Red
+    exit 1
+}
+
 $tagName = "v$Version"
 
 # Check if we're on main branch

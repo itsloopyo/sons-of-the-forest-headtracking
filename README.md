@@ -4,6 +4,12 @@
 
 An unofficial head tracking mod for Sons of the Forest that moves the view with your head while your mouse or controller keeps aiming, driven by a webcam, phone, or any OpenTrack compatible tracker, with no VR headset required.
 
+> **Settings have moved.** This version keeps its settings in `BepInEx\config\CameraUnlock.ini`.
+> The first time it starts it reads your settings from the old
+> `BepInEx\config\com.cameraunlock.sonsoftheforest.headtracking.cfg` into the new file, and leaves
+> the old file as it was. BepInEx's ConfigurationManager no longer lists the settings: edit
+> `CameraUnlock.ini` with any text editor. [Configuration](#configuration) has the details.
+
 ## Features
 
 - **Decoupled look and aim** - head tracking moves the camera; aim stays on your mouse/controller
@@ -134,59 +140,98 @@ CENTER in Headcam, or the equivalent in whatever you run.
 
 ## Configuration
 
-The config file is created after the first launch with the mod installed:
+<!-- cameraunlock:config -->
+The mod reads its settings from `BepInEx\config\CameraUnlock.ini` in the game folder, and creates the file when it starts and finds none. Edit it with any text editor.
 
-`<game folder>/BepInEx/config/com.cameraunlock.sonsoftheforest.headtracking.cfg`
+A setting set to `default` takes its value from `Defaults.ini`, which every head tracking mod that keeps its settings in `CameraUnlock.ini` reads. Head tracking mods that keep their settings in another file do not read it. Writing a value in place of `default` changes that setting for this game only. When the mod saves a setting that a hotkey changed in game, it writes the new value in place of `default`, so that setting no longer follows `Defaults.ini` in this game until you set it to `default` again.
+
+`Defaults.ini` is `%AppData%\CameraUnlock\Defaults.ini` on Windows; `$XDG_CONFIG_HOME/CameraUnlock/Defaults.ini` on Linux, or `~/.config/CameraUnlock/Defaults.ini` where `XDG_CONFIG_HOME` is not set, under Wine and Proton too; and `~/Library/Application Support/CameraUnlock/Defaults.ini` on macOS. The mod's log, where it writes one, names the file it read.
+
+When the mod starts and finds no `Defaults.ini`, it creates one holding the built-in values, unless Windows runs the game as a packaged app, or the game runs on Linux or macOS without Wine or Proton. The mod never changes `Defaults.ini` after that. Edit it with any text editor.
+
+On Linux and macOS without Wine or Proton, this version reads its settings and saves none: it creates no `CameraUnlock.ini` and a change made in game lasts until the game closes.
+
+BepInEx's ConfigurationManager does not list these settings.
+
+The built-in value of each setting set to `default` below:
+
+- `EnableOnStartup=true`
+- `WorldSpaceYaw=true`
+- `RotationEnabled=true`
+- `LocalSmoothing=0.0`
+- `RemoteSmoothing=0.15`
+- `PositionEnabled=true`
+- `PositionLimitX=0.3`
+- `PositionLimitY=0.2`
+- `PositionLimitYDown=0.2`
+- `PositionLimitZ=0.4`
+- `PositionLimitZBack=0.1`
+- `ToggleKey=End, Ctrl+Shift+Y`
+- `CycleTrackingModeKey=PageUp, Ctrl+Shift+G`
+- `YawModeKey=PageDown, Ctrl+Shift+H`
+
+With every setting at its default, the file reads:
 
 ```ini
-[General]
-# Enable head tracking automatically when the game starts.
-EnabledOnStartup = true
-# true = horizon-locked yaw (rotates around world up). false = camera-local yaw.
-WorldSpaceYaw = true
+; Sons of the Forest head tracking settings.
+; Comments start with ; and go on their own line. Text after a value is part of the value.
+; Hotkeys are key names such as End, PageUp or Ctrl+Shift+Y. Separate several with commas; leave empty for none.
+; A setting set to default takes its value from Defaults.ini, which every head tracking mod
+; that keeps its settings in CameraUnlock.ini reads: %AppData%\CameraUnlock\Defaults.ini on
+; Windows, $XDG_CONFIG_HOME/CameraUnlock/Defaults.ini (normally ~/.config/CameraUnlock) on
+; Linux, under Wine and Proton too, and ~/Library/Application Support/CameraUnlock/Defaults.ini
+; on macOS. The log names the file it read. Write a value instead of default to change that
+; setting for this game only.
 
-[Sensitivity]
-YawSensitivity = 1
-PitchSensitivity = 1
-RollSensitivity = 1
+[CameraUnlock]
+; Written by the mod. Leave this section in place.
+ConfigFormat=1
+
+[General]
+; true: head tracking is on when the game starts. ToggleKey turns it on and off.
+EnableOnStartup=default
+; true: yaw turns around the world's up axis. false: around the camera's own up axis.
+WorldSpaceYaw=default
+; true: turning your head turns the view.
+; Tracking mode at startup, with PositionEnabled. The mode hotkey changes both.
+RotationEnabled=default
 
 [Smoothing]
-# Picked per connection from the packet source address. Both cover rotation
-# and position. 0 = no smoothing, 1 = heavy.
-# Tracker running on this machine (loopback):
-LocalSmoothing = 0
-# Tracker on a remote network device, e.g. a phone over WiFi:
-RemoteSmoothing = 0.15
-
-[CoordinateTransform]
-# Flip an axis if it moves the wrong way.
-InvertYaw = false
-# Default on: converts OpenTrack pitch to Unity.
-InvertPitch = true
-InvertRoll = false
+; Smoothing when the tracker runs on this PC. 0 is the least, 1 the most.
+LocalSmoothing=default
+; Smoothing when the tracker is another device on the network, such as a phone.
+; 0 is the least, 1 the most.
+RemoteSmoothing=default
 
 [Position]
-# Positional (6DOF) tracking - lean and move your head to shift the camera.
-PositionEnabled = true
-PositionSensitivityX = 1
-PositionSensitivityY = 1
-PositionSensitivityZ = 1
-# Maximum displacement in meters.
-PositionLimitX = 0.3
-PositionLimitY = 0.2
-PositionLimitZ = 0.4
-# Backward lean limit (small, prevents clipping into the player).
-PositionLimitZBack = 0.1
-# Default on: converts OpenTrack axes to Unity (verified for Sons of the Forest).
-InvertPositionX = true
-InvertPositionY = false
-InvertTrackerZ = false
+; true: moving your head moves the view.
+; Tracking mode at startup, with RotationEnabled. The mode hotkey changes both.
+PositionEnabled=default
+; How far, in metres, leaning left or right can move the view.
+PositionLimitX=default
+; How far, in metres, raising your head can move the view.
+PositionLimitY=default
+; How far, in metres, lowering your head can move the view.
+PositionLimitYDown=default
+; How far, in metres, leaning forward can move the view.
+PositionLimitZ=default
+; How far, in metres, leaning back can move the view.
+PositionLimitZBack=default
 
 [Hotkeys]
-ToggleKey = End
-YawModeKey = PageDown
-PositionToggleKey = PageUp
+; Turns head tracking on and off.
+ToggleKey=default
+; Changes the tracking mode: rotation and position, rotation only, position only.
+CycleTrackingModeKey=default
+; Switches yaw between the world's up axis and the camera's own (WorldSpaceYaw).
+YawModeKey=default
+
+[Debug]
+; true: skip the intro and splash videos on every scene load. For development;
+; leave it false.
+DebugFastBoot=false
 ```
+<!-- /cameraunlock:config -->
 
 ## Troubleshooting
 
@@ -203,12 +248,12 @@ PositionToggleKey = PageUp
 
 **Jittery / unstable tracking**
 
-- Raise `RemoteSmoothing` (phone or other network tracker) or `LocalSmoothing` (tracker on this PC) in the config file, try 0.3 to 0.5.
+- Raise `RemoteSmoothing` (phone or other network tracker) or `LocalSmoothing` (tracker on this PC) in `CameraUnlock.ini`, try 0.3 to 0.5.
 - Phone trackers over WiFi are the most jitter-prone; raise `RemoteSmoothing` further or use a wired tracker.
 
 **Wrong rotation axis**
 
-- Toggle `InvertYaw` / `InvertPitch` / `InvertRoll` in the config file.
+- The mod has no axis inversion setting. Invert the axis in your tracker app.
 - If yaw feels wrong when looking up or down at extreme angles, toggle between world-locked and camera-local yaw with `Page Down` (or `Ctrl+Shift+H`).
 
 **Crosshair drifts when looking around**

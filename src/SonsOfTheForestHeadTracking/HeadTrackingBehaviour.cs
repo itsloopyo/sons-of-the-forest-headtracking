@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using CameraUnlock.Core.Input;
 using CameraUnlock.Core.Tracking;
 using CameraUnlock.Core.Unity.Extensions;
 using CameraUnlock.Core.Unity.Il2Cpp;
@@ -30,8 +32,12 @@ public class HeadTrackingBehaviour : MonoBehaviour
     private const int DiagnosticLogBudget = 10;
 
     private HeadTrackingSession? _session;
-    private ModConfig? _config;
     private SplitInjectionCameraTracker? _tracker;
+    private Action<Action<SonsOfTheForestConfig>>? _saveConfig;
+
+    private KeyBinding[] _toggleKeys = new KeyBinding[0];
+    private KeyBinding[] _cycleTrackingModeKeys = new KeyBinding[0];
+    private KeyBinding[] _yawModeKeys = new KeyBinding[0];
 
     private bool _trackingEnabled = true;
     private bool _worldSpaceYaw = true;
@@ -44,25 +50,33 @@ public class HeadTrackingBehaviour : MonoBehaviour
 
     public HeadTrackingBehaviour(IntPtr ptr) : base(ptr) { }
 
-    internal void Initialize(HeadTrackingSession session, ModConfig config)
+    internal void Initialize(HeadTrackingSession session, SonsOfTheForestConfig config,
+        Action<Action<SonsOfTheForestConfig>> saveConfig)
     {
         _session = session;
-        _config = config;
+        _saveConfig = saveConfig;
         _tracker = new SplitInjectionCameraTracker { Log = msg => Plugin.Logger.LogInfo(msg) };
-        _trackingEnabled = config.EnabledOnStartup;
+        _trackingEnabled = config.EnableOnStartup;
         _worldSpaceYaw = config.WorldSpaceYaw;
+        _toggleKeys = ParseKeys("ToggleKey", config.ToggleKeyName);
+        _cycleTrackingModeKeys = ParseKeys("CycleTrackingModeKey", config.CycleTrackingModeKeyName);
+        _yawModeKeys = ParseKeys("YawModeKey", config.YawModeKeyName);
         _initialized = true;
+
+        Plugin.Logger.LogInfo($"Hotkeys: [{config.ToggleKeyName}] toggle, [{config.CycleTrackingModeKeyName}] cycle tracking mode, " +
+                              $"[{config.YawModeKeyName}] yaw mode");
 
         Plugin.Logger.LogInfo("HeadTrackingBehaviour initialized (split matrix/transform injection in LateUpdate).");
     }
 
     private void Update()
     {
-        if (!_initialized || _config == null || _session == null || _tracker == null || !_hotkeysAvailable) return;
+        if (!_initialized || _session == null || _tracker == null || !_hotkeysAvailable) return;
 
         try
         {
-            if (ChordHotkeys.IsActionPressed(_config.ToggleKey, ChordHotkeys.ToggleLetter))
+            // The on/off toggle is never saved: the next start follows EnableOnStartup.
+            if (KeyBindingInput.IsTriggered(_toggleKeys))
             {
                 _trackingEnabled = !_trackingEnabled;
                 Plugin.Logger.LogInfo($"Head tracking {(_trackingEnabled ? "ENABLED" : "DISABLED")}");
@@ -70,17 +84,25 @@ public class HeadTrackingBehaviour : MonoBehaviour
                 else _session.Reset();
             }
 
-            if (ChordHotkeys.IsActionPressed(_config.PositionToggleKey, ChordHotkeys.PositionLetter))
+            if (KeyBindingInput.IsTriggered(_cycleTrackingModeKeys))
             {
                 TrackingMode mode = _session.CycleMode();
                 if (!_session.RotationActive) _tracker.ResetMatrices();
                 Plugin.Logger.LogInfo($"Tracking mode: {mode.Description()}");
+                TrackingModeChannels.Encode(mode, out bool rotation, out bool position);
+                _saveConfig!(c =>
+                {
+                    c.RotationEnabled = rotation;
+                    c.PositionEnabled = position;
+                });
             }
 
-            if (ChordHotkeys.IsActionPressed(_config.YawModeKey, ChordHotkeys.FourthToggleLetter))
+            if (KeyBindingInput.IsTriggered(_yawModeKeys))
             {
-                _worldSpaceYaw = !_worldSpaceYaw;
+                bool worldSpaceYaw = !_worldSpaceYaw;
+                _worldSpaceYaw = worldSpaceYaw;
                 Plugin.Logger.LogInfo($"Yaw mode: {(_worldSpaceYaw ? "world-space (horizon-locked)" : "camera-local")}");
+                _saveConfig!(c => c.WorldSpaceYaw = worldSpaceYaw);
             }
         }
         catch (InvalidOperationException ex)
@@ -124,11 +146,15 @@ public class HeadTrackingBehaviour : MonoBehaviour
 
         var rotation = _session.Rotation;
         Vector3 positionOffset = new Vector3(
-            _session.PositionOffset.X, _session.PositionOffset.Y, _session.PositionOffset.Z);
+            -_session.PositionOffset.X, _session.PositionOffset.Y, _session.PositionOffset.Z);
 
-        // Roll is passed through un-negated: SotF's view-space convention is opposite to
-        // OpenTrack's (verified in-game - negated roll tilts the wrong way).
-        _tracker.Apply(rotation.Yaw, rotation.Pitch, rotation.Roll, positionOffset,
+        // The axis conversion into SotF's view space, applied once here at the boundary: pitch
+        // and lateral position are negated, which the published builds did through their shipped
+        // InvertPitch=true and InvertPositionX=true (the lateral limit is symmetric, so negating
+        // after the clamp gives the same offset). Roll is passed through un-negated: SotF's
+        // view-space convention is opposite to OpenTrack's (verified in-game - negated roll tilts
+        // the wrong way).
+        _tracker.Apply(rotation.Yaw, -rotation.Pitch, rotation.Roll, positionOffset,
             _session.RotationActive, _session.PositionActive, _worldSpaceYaw);
 
         if (!_wasTracking)
@@ -175,6 +201,23 @@ public class HeadTrackingBehaviour : MonoBehaviour
         if (reason == _lastGateReason) return;
         _lastGateReason = reason;
         Plugin.Logger.LogInfo($"Tracking gated: {reason} [scene='{SceneManager.GetActiveScene().name}']");
+    }
+
+    // The table's hotkey codec has read every list the file holds, so a list that does not parse
+    // reaches here only from a legacy import the owner deferred: a .cfg key code Unity names no key
+    // for, which the import writes as the number. The items that parse, the chord among them, are
+    // bound and the rest are named in the log.
+    private static KeyBinding[] ParseKeys(string key, string text)
+    {
+        if (KeyBindings.TryParse(text, out KeyBinding[] bindings, out _)) return bindings;
+
+        var kept = new List<KeyBinding>();
+        foreach (string item in text.Split(','))
+        {
+            if (KeyBindings.TryParse(item, out bindings, out string? error)) kept.AddRange(bindings);
+            else Plugin.Logger.LogWarning($"[Hotkeys] {key}: {error}, so it is not bound this session");
+        }
+        return kept.ToArray();
     }
 
     private void OnDestroy()

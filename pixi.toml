@@ -15,13 +15,26 @@ install = { cmd = "powershell -ExecutionPolicy Bypass -File scripts/deploy.ps1 R
 package = { cmd = "powershell -ExecutionPolicy Bypass -File scripts/package-release.ps1", depends-on = ["test"] }
 uninstall = "scripts\\uninstall.cmd"
 # The repo checks, then the config tests, among them the differential test in
-# tests/config_differential, which holds the frozen legacy reader to the published build's own
-# reader on its first-run file and on core's mutation corpus. What the mod does to the camera is
-# checked by an in-game pass.
-test = { cmd = "powershell -ExecutionPolicy Bypass -File scripts/validate-repo.ps1 && dotnet test tests/SonsOfTheForestHeadTracking.Tests/SonsOfTheForestHeadTracking.Tests.csproj -c Release", depends-on = ["build"] }
+# tests/config_differential, which holds the legacy import to the published build's own reader on
+# its first-run file and on core's mutation corpus, then core's canonical config lint over the
+# committed file and every file the test migrated. What the mod does to the camera is checked by an
+# in-game pass.
+test = { cmd = "powershell -ExecutionPolicy Bypass -File scripts/validate-repo.ps1 && dotnet test tests/SonsOfTheForestHeadTracking.Tests/SonsOfTheForestHeadTracking.Tests.csproj -c Release && node tests/config_differential/lint-migrated.mjs tests/SonsOfTheForestHeadTracking.Tests/bin/Release/net8.0/migrated", depends-on = ["build"] }
+# Rewrites config/CameraUnlock.ini from the config table after a change to a row, a comment or a
+# default. The render test compares the two on every `pixi run test`, so the committed file cannot
+# drift from the code.
+render-config = { cmd = "dotnet test tests/SonsOfTheForestHeadTracking.Tests/SonsOfTheForestHeadTracking.Tests.csproj -c Release --filter FullyQualifiedName~ConfigTests.CommittedFileIsTheRenderedDefaults && node cameraunlock-core/scripts/encode-seed.mjs", env = { CAMERAUNLOCK_RENDER_CONFIG = "write" }, depends-on = ["build"] }
+# Reads the newest ZIP in release/ and checks every source a manifest entry names is really in it,
+# and the config descriptor. No depends-on: it runs after packaging.
+validate-manifest = "node cameraunlock-core/scripts/validate-manifest.mjs"
 clean = "dotnet clean src/SonsOfTheForestHeadTracking/SonsOfTheForestHeadTracking.csproj"
 
 # Bump vendored mod-loader copies to latest upstream. Manual; commit the result.
 update-deps = "powershell -ExecutionPolicy Bypass -File scripts/update-deps.ps1"
 
 release = "powershell -ExecutionPolicy Bypass -File scripts/release.ps1"
+
+[dependencies]
+# Node runs the canonical config lint in `test`, which `package` depends on, and
+# validate-manifest. Pinned to the release cameraunlock-core's own lock resolves.
+nodejs = "==26.5.0"
