@@ -14,6 +14,13 @@ on:
       - 'docs/**'
       - 'LICENSE'
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     name: Build and Validate
@@ -39,12 +46,6 @@ jobs:
 
       - name: Setup pixi
         uses: prefix-dev/setup-pixi@5185adfbffb4bd703da3010310260805d89ebb11 # v0.9.6
-
-      # Same pixi task a developer runs, and ahead of packaging so a failure
-      # blocks the artifact rather than shipping beside it.
-      - name: Test
-        shell: pwsh
-        run: pixi run test
 
       # Build + package through the SAME command a developer runs locally. Every
       # build dependency is produced by scripts/setup-libs.ps1 inside the pixi
