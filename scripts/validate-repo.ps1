@@ -27,6 +27,23 @@ function Test-Check {
     }
 }
 
+# Not Get-FileHash: Windows PowerShell 5.1 autoloads it from a script module,
+# and a powershell.exe started from pwsh (GitHub Actions' shell: pwsh)
+# inherits pwsh's PSModulePath, resolves the Core-only
+# Microsoft.PowerShell.Utility first and reports the cmdlet as not recognized.
+function Get-Sha256Hex {
+    param([Parameter(Mandatory)][string]$LiteralPath)
+
+    $sha    = [System.Security.Cryptography.SHA256]::Create()
+    $stream = [System.IO.File]::OpenRead((Convert-Path -LiteralPath $LiteralPath))
+    try {
+        return [BitConverter]::ToString($sha.ComputeHash($stream)).Replace('-', '').ToLowerInvariant()
+    } finally {
+        $stream.Dispose()
+        $sha.Dispose()
+    }
+}
+
 function Get-FirstMatch {
     param([string]$Path, [string]$Pattern)
     $content = Get-Content $Path -Raw
@@ -145,7 +162,7 @@ Test-Check "vendor/bepinex/README.md exists" (Test-Path $vendorReadme) `
 
 if ((Test-Path $vendorZip) -and (Test-Path $vendorReadme)) {
     $recordedSha = Get-FirstMatch $vendorReadme '(?m)SHA-256:\s*``?([0-9a-fA-F]{64})'
-    $actualSha = (Get-FileHash $vendorZip -Algorithm SHA256).Hash.ToLower()
+    $actualSha = Get-Sha256Hex $vendorZip
     Test-Check "vendored zip SHA-256 matches recorded hash" ($recordedSha -and ($actualSha -eq $recordedSha.ToLower())) `
         "vendor/bepinex/README.md records '$recordedSha' but the zip hashes to '$actualSha'. The vendored loader was modified outside update-deps.ps1."
 

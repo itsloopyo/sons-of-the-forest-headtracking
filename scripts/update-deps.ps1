@@ -17,6 +17,23 @@ $ProgressPreference    = 'SilentlyContinue'
 $scriptDir  = Split-Path -Parent $MyInvocation.MyCommand.Path
 $projectDir = Split-Path -Parent $scriptDir
 
+# Not Get-FileHash: Windows PowerShell 5.1 autoloads it from a script module,
+# and a powershell.exe started from pwsh (GitHub Actions' shell: pwsh)
+# inherits pwsh's PSModulePath, resolves the Core-only
+# Microsoft.PowerShell.Utility first and reports the cmdlet as not recognized.
+function Get-Sha256Hex {
+    param([Parameter(Mandatory)][string]$LiteralPath)
+
+    $sha    = [System.Security.Cryptography.SHA256]::Create()
+    $stream = [System.IO.File]::OpenRead((Convert-Path -LiteralPath $LiteralPath))
+    try {
+        return [BitConverter]::ToString($sha.ComputeHash($stream)).Replace('-', '').ToLowerInvariant()
+    } finally {
+        $stream.Dispose()
+        $sha.Dispose()
+    }
+}
+
 $out = Join-Path $projectDir 'vendor/bepinex'
 if (-not (Test-Path $out)) { New-Item -ItemType Directory -Path $out -Force | Out-Null }
 
@@ -40,7 +57,7 @@ $zip = Join-Path $out 'BepInEx_UnityIL2CPP_x64.zip'
 $tmpZip = "$zip.tmp"
 Write-Host "  Fetching build $($best.Build) ($($best.Asset))" -ForegroundColor DarkGray
 Invoke-WebRequest -Uri $assetUrl -OutFile $tmpZip -UseBasicParsing -Headers $headers -TimeoutSec 120
-$sha = (Get-FileHash $tmpZip -Algorithm SHA256).Hash.ToLower()
+$sha = Get-Sha256Hex $tmpZip
 
 $readmePath = Join-Path $out 'README.md'
 if (Test-Path $readmePath) {
