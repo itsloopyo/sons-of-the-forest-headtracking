@@ -72,37 +72,14 @@ public class HeadTrackingBehaviour : MonoBehaviour
     {
         if (!_initialized || _session == null || _tracker == null || !_hotkeysAvailable) return;
 
+        bool toggle;
+        bool cycleTrackingMode;
+        bool yawMode;
         try
         {
-            // The on/off toggle is never saved: the next start follows EnableOnStartup.
-            if (KeyBindingInput.IsTriggered(_toggleKeys))
-            {
-                _trackingEnabled = !_trackingEnabled;
-                Plugin.Logger.LogInfo($"Head tracking {(_trackingEnabled ? "ENABLED" : "DISABLED")}");
-                if (!_trackingEnabled) _tracker.ResetAll();
-                else _session.Reset();
-            }
-
-            if (KeyBindingInput.IsTriggered(_cycleTrackingModeKeys))
-            {
-                TrackingMode mode = _session.CycleMode();
-                if (!_session.RotationActive) _tracker.ResetMatrices();
-                Plugin.Logger.LogInfo($"Tracking mode: {mode.Description()}");
-                TrackingModeChannels.Encode(mode, out bool rotation, out bool position);
-                _saveConfig!(c =>
-                {
-                    c.RotationEnabled = rotation;
-                    c.PositionEnabled = position;
-                });
-            }
-
-            if (KeyBindingInput.IsTriggered(_yawModeKeys))
-            {
-                bool worldSpaceYaw = !_worldSpaceYaw;
-                _worldSpaceYaw = worldSpaceYaw;
-                Plugin.Logger.LogInfo($"Yaw mode: {(_worldSpaceYaw ? "world-space (horizon-locked)" : "camera-local")}");
-                _saveConfig!(c => c.WorldSpaceYaw = worldSpaceYaw);
-            }
+            toggle = KeyBindingInput.IsTriggered(_toggleKeys);
+            cycleTrackingMode = KeyBindingInput.IsTriggered(_cycleTrackingModeKeys);
+            yawMode = KeyBindingInput.IsTriggered(_yawModeKeys);
         }
         catch (InvalidOperationException ex)
         {
@@ -110,6 +87,37 @@ public class HeadTrackingBehaviour : MonoBehaviour
             // Boundary with the game's input configuration; tracking itself is unaffected.
             _hotkeysAvailable = false;
             Plugin.Logger.LogWarning($"Hotkeys disabled - legacy Input unavailable: {ex.Message}");
+            return;
+        }
+
+        // The on/off toggle is never saved: the next start follows EnableOnStartup.
+        if (toggle)
+        {
+            _trackingEnabled = !_trackingEnabled;
+            Plugin.Logger.LogInfo($"Head tracking {(_trackingEnabled ? "ENABLED" : "DISABLED")}");
+            if (!_trackingEnabled) _tracker.ResetAll();
+            else _session.Reset();
+        }
+
+        if (cycleTrackingMode)
+        {
+            TrackingMode mode = _session.CycleMode();
+            if (!_session.RotationActive) _tracker.ResetMatrices();
+            Plugin.Logger.LogInfo($"Tracking mode: {mode.Description()}");
+            TrackingModeChannels.Encode(mode, out bool rotation, out bool position);
+            _saveConfig!(c =>
+            {
+                c.RotationEnabled = rotation;
+                c.PositionEnabled = position;
+            });
+        }
+
+        if (yawMode)
+        {
+            bool worldSpaceYaw = !_worldSpaceYaw;
+            _worldSpaceYaw = worldSpaceYaw;
+            Plugin.Logger.LogInfo($"Yaw mode: {(_worldSpaceYaw ? "world-space (horizon-locked)" : "camera-local")}");
+            _saveConfig!(c => c.WorldSpaceYaw = worldSpaceYaw);
         }
     }
 
